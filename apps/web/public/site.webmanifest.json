@@ -1,7 +1,7 @@
 {
-  "name": "Plane",
-  "short_name": "Plane",
-  "description": "Plane helps you plan your issues, cycles, and product modules.",
+  "name": "TO DO List",
+  "short_name": "TO DO List",
+  "description": "Volta Motor work tracking: projects, work items, and cycles in one place.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f9fafb",
