@@ -100,6 +100,11 @@ export const coreRoutes: RouteConfigEntry[] = [
           ),
         ]),
 
+        // General board: work items of every project on one board
+        layout("./(all)/[workspaceSlug]/(projects)/board/layout.tsx", [
+          route(":workspaceSlug/board", "./(all)/[workspaceSlug]/(projects)/board/page.tsx"),
+        ]),
+
         // Stickies
         layout("./(all)/[workspaceSlug]/(projects)/stickies/layout.tsx", [
           route(":workspaceSlug/stickies", "./(all)/[workspaceSlug]/(projects)/stickies/page.tsx"),

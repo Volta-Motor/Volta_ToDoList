@@ -1,4 +1,32 @@
 {
+  "general_board": {
+    "title": "Board",
+    "project": "Project",
+    "assignee": "Assignee",
+    "all": "All",
+    "unassigned": "Unassigned",
+    "assignee_count": "{count} assignees",
+    "empty_column": "No work items in this filter",
+    "loading": "Loading",
+    "load_failed": "The board could not be loaded. Reload the page to try again.",
+    "open_work_truncated": "There is more open work than the board can show. Filter by project in the project's own views to see the rest.",
+    "closed_work_limited": "Completed and cancelled columns show the {count} most recently updated work items.",
+    "groups": {
+      "backlog": "Backlog",
+      "unstarted": "To do",
+      "started": "In progress",
+      "completed": "Done",
+      "cancelled": "Cancelled"
+    },
+    "update_failed": {
+      "title": "Could not save the change",
+      "message": "The work item was put back. Try again."
+    },
+    "no_state": {
+      "title": "Cannot move here",
+      "message": "This work item's project has no state in that column."
+    }
+  },
   "cloud_maintenance_message": {
     "we_are_working_on_this_if_you_need_immediate_assistance": "Pracujemy nad tym. Jeśli potrzebujesz natychmiastowej pomocy,",
     "reach_out_to_us": "skontaktuj się z nami",
