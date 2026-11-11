@@ -28,29 +28,29 @@ type TAuthHeader = {
 const Titles = {
   [EAuthModes.SIGN_IN]: {
     [EAuthSteps.EMAIL]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Welcome back to TO DO List.",
     },
     [EAuthSteps.PASSWORD]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Welcome back to TO DO List.",
     },
     [EAuthSteps.UNIQUE_CODE]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Welcome back to TO DO List.",
     },
   },
   [EAuthModes.SIGN_UP]: {
     [EAuthSteps.EMAIL]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Create your TO DO List account.",
     },
     [EAuthSteps.PASSWORD]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Create your TO DO List account.",
     },
     [EAuthSteps.UNIQUE_CODE]: {
-      header: "Work in all dimensions.",
+      header: "Volta Motor",
       subHeader: "Create your TO DO List account.",
     },
   },
