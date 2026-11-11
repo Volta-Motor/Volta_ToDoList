@@ -44,6 +44,8 @@ from .views import (
     GiteaOauthInitiateEndpoint,
     GiteaCallbackSpaceEndpoint,
     GiteaOauthInitiateSpaceEndpoint,
+    OIDCCallbackEndpoint,
+    OIDCOauthInitiateEndpoint,
 )
 
 urlpatterns = [
@@ -150,4 +152,7 @@ urlpatterns = [
         GiteaCallbackSpaceEndpoint.as_view(),
         name="space-gitea-callback",
     ),
+    ## OpenID Connect (Zitadel, Keycloak, ...)
+    path("oidc/", OIDCOauthInitiateEndpoint.as_view(), name="oidc-initiate"),
+    path("oidc/callback/", OIDCCallbackEndpoint.as_view(), name="oidc-callback"),
 ]

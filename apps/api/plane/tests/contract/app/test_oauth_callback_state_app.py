@@ -14,6 +14,7 @@ CALLBACKS = [
     ("gitlab-callback", "plane.authentication.views.app.gitlab.GitLabOAuthProvider"),
     ("google-callback", "plane.authentication.views.app.google.GoogleOAuthProvider"),
     ("gitea-callback", "plane.authentication.views.app.gitea.GiteaOAuthProvider"),
+    ("oidc-callback", "plane.authentication.views.app.oidc.OIDCOAuthProvider"),
     ("space-gitea-callback", "plane.authentication.views.space.gitea.GiteaOAuthProvider"),
 ]
 
@@ -98,7 +99,7 @@ class TestOAuthCallbackState:
         provider.assert_not_called()
 
 
-APP_CALLBACKS = ["github-callback", "gitlab-callback", "google-callback", "gitea-callback"]
+APP_CALLBACKS = ["github-callback", "gitlab-callback", "google-callback", "gitea-callback", "oidc-callback"]
 
 
 @pytest.mark.contract
@@ -113,3 +114,39 @@ def test_refused_without_session_redirects_to_app_host(url_name, settings):
     location = urlparse(response.url)
     assert (location.scheme, location.netloc) == ("http", "app.example.com")
     assert "error_code" in response.url
+
+
+@pytest.mark.contract
+@pytest.mark.django_db
+class TestOIDCCallbackCodeVerifier:
+    """The PKCE verifier stored at initiation is handed to the provider once and then dropped."""
+
+    PROVIDER_PATH = "plane.authentication.views.app.oidc.OIDCOAuthProvider"
+
+    def _client(self):
+        client = _client(session_state="expected-state")
+        session = client.session
+        session["oidc_code_verifier"] = "stored-verifier"
+        session.save()
+        return client
+
+    def test_matching_state_passes_and_clears_verifier(self, create_user):
+        client = self._client()
+
+        with patch(self.PROVIDER_PATH) as provider:
+            provider.return_value.authenticate.return_value = create_user
+            response = client.get(reverse("oidc-callback"), {"code": "oauth-code", "state": "expected-state"})
+
+        assert "error_code" not in response.url
+        assert provider.call_args.kwargs["code_verifier"] == "stored-verifier"
+        assert "oidc_code_verifier" not in client.session
+
+    def test_mismatched_state_keeps_verifier(self):
+        client = self._client()
+
+        with patch(self.PROVIDER_PATH) as provider:
+            response = client.get(reverse("oidc-callback"), {"code": "oauth-code", "state": "other-state"})
+
+        assert "error_code" in response.url
+        provider.assert_not_called()
+        assert client.session["oidc_code_verifier"] == "stored-verifier"

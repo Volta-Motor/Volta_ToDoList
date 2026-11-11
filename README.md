@@ -15,7 +15,7 @@ Kod GNU AGPL-3.0 lisansı altındadır; bkz. `LICENSE.txt` ve `COPYRIGHT.txt`. P
 ## Planlanan değişiklikler
 
 1. Uygulama adı ve Volta görünümü
-2. Zitadel ile giriş (OIDC)
+2. Zitadel ile giriş (OIDC): eklendi, kurulum için `docs/zitadel-giris.md`
 3. Genel board: tüm projelerin işleri tek board'da, kartta proje etiketi
 4. İş türleri ve Azure Boards tarzı alanlar (kabul kriterleri vb.)
 5. Faaliyet raporları ekranı
