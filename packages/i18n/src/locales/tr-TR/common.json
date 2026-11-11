@@ -1,4 +1,32 @@
 {
+  "general_board": {
+    "title": "Board",
+    "project": "Proje",
+    "assignee": "Atanan",
+    "all": "Tümü",
+    "unassigned": "Atanmamış",
+    "assignee_count": "{count} kişi",
+    "empty_column": "Bu filtrede iş yok",
+    "loading": "Yükleniyor",
+    "load_failed": "Board yüklenemedi. Yeniden denemek için sayfayı yenileyin.",
+    "open_work_truncated": "Board'un gösterebileceğinden fazla açık iş var. Kalanını görmek için projenin kendi görünümlerini kullanın.",
+    "closed_work_limited": "Tamamlandı ve İptal kolonlarında en son güncellenen {count} iş gösterilir.",
+    "groups": {
+      "backlog": "Bekleyen",
+      "unstarted": "Yapılacak",
+      "started": "Devam ediyor",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal"
+    },
+    "update_failed": {
+      "title": "Değişiklik kaydedilemedi",
+      "message": "İş eski yerine alındı. Yeniden deneyin."
+    },
+    "no_state": {
+      "title": "Buraya taşınamıyor",
+      "message": "Bu işin projesinde bu kolona karşılık gelen bir durum yok."
+    }
+  },
   "cloud_maintenance_message": {
     "we_are_working_on_this_if_you_need_immediate_assistance": "Bu konuda çalışıyoruz. Acil yardıma ihtiyacınız varsa,",
     "reach_out_to_us": "bize ulaşın",

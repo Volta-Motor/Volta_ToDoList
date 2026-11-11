@@ -7,6 +7,7 @@
 import {
   AnalyticsOutline,
   ArchiveOutline,
+  BoardOutline,
   CyclesOutline,
   DraftsOutline,
   HomeOutline,
@@ -22,6 +23,8 @@ export const getSidebarNavigationItemIcon = (key: string, className: string = ""
   switch (key) {
     case "home":
       return <HomeOutline className={cn("size-4 flex-shrink-0", className)} />;
+    case "board":
+      return <BoardOutline className={cn("size-4 flex-shrink-0", className)} />;
     case "inbox":
       return <InboxOutline className={cn("size-4 flex-shrink-0", className)} />;
     case "projects":
