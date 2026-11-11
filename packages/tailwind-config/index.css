@@ -16,6 +16,86 @@
 @import "@makeplane/propel/styles";
 @source "../**/*.{ts,tsx}";
 
+/*
+ * Volta Motor brand colors.
+ *
+ * propel ships a blue brand ramp. These overrides swap it for Volta navy and use Volta green
+ * for accent text, links and accent borders. Solid accent backgrounds stay navy because the
+ * text on them is white, and white on Volta green (#95C11F) is not readable.
+ *
+ * propel sets its dark values inside zero-specificity `:where()` selectors, so each block here
+ * is scoped to one theme; a bare `:root` rule would override the dark theme too. User-defined
+ * custom themes are left alone.
+ */
+@layer base {
+  :root:not([data-theme*="dark"]):not([data-custom-theme="true"]) {
+    --brand-50: #f5f7f9;
+    --brand-100: #edf1f4;
+    --brand-200: #e6ebef;
+    --brand-300: #c6d0d8;
+    --brand-400: #b0bdc9;
+    --brand-500: #9aabb9;
+    --brand-600: #6a8296;
+    --brand-700: #405c72;
+    --brand-800: #2c4457;
+    --brand-900: #1f3241;
+    --brand-1000: #14212d;
+    --brand-1100: #0c141c;
+    --brand-1200: #080e14;
+    --brand-default: #14212d;
+
+    --bg-canvas: #f8f6f0;
+
+    --bg-accent-primary: #14212d;
+    --bg-accent-primary-hover: #1f3241;
+    --bg-accent-primary-active: #2c4457;
+    --bg-accent-subtle: #eef6d9;
+    --bg-accent-subtle-hover: #dcedb0;
+    --bg-accent-subtle-active: #c3e07b;
+
+    --border-accent-strong: #7ba317;
+    --border-accent-subtle: #c3e07b;
+
+    --txt-accent-primary: #4a6210;
+    --txt-accent-secondary: #5f7e12;
+    --txt-icon-accent-primary: #5f7e12;
+    --txt-icon-accent-subtle: #acd24a;
+    --txt-link-primary: #4a6210;
+    --txt-link-primary-hover: #36480c;
+  }
+
+  :root[data-theme*="dark"]:not([data-custom-theme="true"]) {
+    --brand-50: #0c141c;
+    --brand-100: #14212d;
+    --brand-200: #1f3241;
+    --brand-300: #2c4457;
+    --brand-400: #405c72;
+    --brand-500: #4d6a82;
+    --brand-600: #6a8296;
+    --brand-700: #9aabb9;
+    --brand-800: #b0bdc9;
+    --brand-900: #c6d0d8;
+    --brand-1000: #e6ebef;
+    --brand-1100: #f5f7f9;
+    --brand-1200: #fbfcfd;
+    --brand-default: #405c72;
+
+    --bg-accent-primary: #405c72;
+    --bg-accent-primary-hover: #4d6a82;
+    --bg-accent-primary-active: #5b7a93;
+
+    --border-accent-strong: #95c11f;
+    --border-accent-subtle: #5f7e12;
+
+    --txt-accent-primary: #acd24a;
+    --txt-accent-secondary: #c3e07b;
+    --txt-icon-accent-primary: #95c11f;
+    --txt-icon-accent-subtle: #7ba317;
+    --txt-link-primary: #acd24a;
+    --txt-link-primary-hover: #c3e07b;
+  }
+}
+
 * {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
