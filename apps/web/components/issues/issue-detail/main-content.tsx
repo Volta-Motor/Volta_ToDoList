@@ -15,6 +15,7 @@ import { useTranslation } from "@plane/i18n";
 import type { TNameDescriptionLoader } from "@plane/types";
 import { EFileAssetType, EIssueServiceType } from "@plane/types";
 // components
+import { AcceptanceCriteriaRoot } from "@/components/acceptance-criteria/root";
 import { DescriptionVersionsRoot } from "@/components/core/description-versions";
 import { DescriptionInput } from "@/components/editor/rich-text/description-input";
 import { IssueTypeSwitcher } from "@/components/issues/issue-type-switcher";
@@ -222,6 +223,14 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
           )}
         </div>
       </div>
+
+      <AcceptanceCriteriaRoot
+        workspaceSlug={workspaceSlug}
+        projectId={projectId}
+        issueId={issueId}
+        disabled={!isEditable || isArchived}
+        className="pb-6"
+      />
 
       <IssueDetailWidgets
         workspaceSlug={workspaceSlug}

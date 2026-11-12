@@ -42,7 +42,10 @@ from plane.db.models import (
     IssueDescriptionVersion,
     ProjectMember,
     EstimatePoint,
+    IssueType,
+    Project,
 )
+from plane.todolist.work_item_types import default_work_item_type
 from plane.utils.content_validator import (
     validate_html_content,
     validate_binary_data,
@@ -86,6 +89,9 @@ class IssueCreateSerializer(BaseSerializer):
     )
     parent_id = serializers.PrimaryKeyRelatedField(
         source="parent", queryset=Issue.objects.all(), required=False, allow_null=True
+    )
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
     )
     label_ids = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Label.objects.all()),
@@ -195,6 +201,17 @@ class IssueCreateSerializer(BaseSerializer):
         ):
             raise serializers.ValidationError("Parent is not valid issue_id please pass a valid issue_id")
 
+        # The work item type must be one of the project's workspace types. `type`
+        # is also writable under its model name, so this covers both spellings.
+        if attrs.get("type") and not (
+            attrs["type"].is_active
+            and not attrs["type"].is_epic
+            and Project.objects.filter(
+                pk=self.context.get("project_id"), workspace_id=attrs["type"].workspace_id
+            ).exists()
+        ):
+            raise serializers.ValidationError("Type is not valid please pass a valid type_id")
+
         if (
             attrs.get("estimate_point")
             and not EstimatePoint.objects.filter(
@@ -213,6 +230,10 @@ class IssueCreateSerializer(BaseSerializer):
         project_id = self.context["project_id"]
         workspace_id = self.context["workspace_id"]
         default_assignee_id = self.context["default_assignee_id"]
+
+        # A work item created without a type gets the workspace's default one.
+        if not validated_data.get("type"):
+            validated_data["type"] = default_work_item_type(workspace_id)
 
         # Create Issue
         issue = Issue.objects.create(**validated_data, project_id=project_id)
@@ -819,6 +840,7 @@ class IssueSerializer(DynamicBaseSerializer):
             "link_count",
             "is_draft",
             "archived_at",
+            "type_id",
         ]
         read_only_fields = fields
 

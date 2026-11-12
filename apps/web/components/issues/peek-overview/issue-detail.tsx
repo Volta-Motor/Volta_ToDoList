@@ -12,6 +12,7 @@ import type { EditorRefApi } from "@plane/editor";
 import { EFileAssetType } from "@plane/types";
 import type { TNameDescriptionLoader } from "@plane/types";
 // components
+import { AcceptanceCriteriaRoot } from "@/components/acceptance-criteria/root";
 import { DescriptionVersionsRoot } from "@/components/core/description-versions";
 import { DescriptionInput } from "@/components/editor/rich-text/description-input";
 // hooks
@@ -188,6 +189,13 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
           />
         )}
       </div>
+
+      <AcceptanceCriteriaRoot
+        workspaceSlug={workspaceSlug}
+        projectId={issue.project_id}
+        issueId={issueId}
+        disabled={disabled || isArchived}
+      />
     </div>
   );
 });
