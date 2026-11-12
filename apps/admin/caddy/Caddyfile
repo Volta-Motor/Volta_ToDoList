@@ -9,14 +9,21 @@
 :3000 {
 	root * /usr/share/caddy/html
 
-	# Per-client-IP rate limiting for static asset requests
+	# Per-client-IP rate limiting for static asset requests.
+	# One cold page load fetches several hundred build files (about 360 for the
+	# board page), so the limit has to sit well above that: at 300 a single
+	# visitor was answered with 429 while the page was still loading.
 	rate_limit {
 		zone static {
 			key {client_ip}
-			events 300
+			events 6000
 			window 1m
 		}
 	}
+
+	# Build files carry a content hash in their name and never change, so
+	# browsers may keep them instead of asking again on every page load.
+	header /god-mode/assets/* Cache-Control "public, max-age=31536000, immutable"
 
 	# Security headers (HSTS is set at the TLS terminator)
 	header {
