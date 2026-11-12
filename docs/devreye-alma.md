@@ -117,14 +117,15 @@ docker run --rm -v todolist_uploads:/data -v "$PWD":/yedek alpine \
 
 ## Sorun giderme
 
-| Belirti                               | Bakılacak yer                                                                            |
-| ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Derleme yarıda kesiliyor              | Docker'a ayrılan bellek (Docker Desktop → Settings → Resources); en az 6–8 GB verin      |
-| "port is already allocated"           | Port dolu; `.env` içinde `LISTEN_HTTP_PORT`/`LISTEN_HTTPS_PORT` ve `WEB_URL` değerleri   |
-| Sayfa açılıyor, giriş yapılamıyor     | `.env` içindeki `WEB_URL` ve `CORS_ALLOWED_ORIGINS` tarayıcıdaki adresle birebir aynı mı |
-| Zitadel'den dönüşte hata              | Yönlendirme adresi ve Issuer URL; kullanıcının e-postası Zitadel'de doğrulanmış mı       |
-| `api` sürekli yeniden başlıyor        | `docker compose logs api` ve `docker compose logs migrator`                              |
-| Dosya eklenemiyor                     | `docker compose logs plane-minio`; `.env` içindeki depolama anahtarları değişmiş mi      |
-| Bildirim/etkinlik kayıtları oluşmuyor | `docker compose logs worker` ve `docker compose logs plane-mq`                           |
+| Belirti                                                                 | Bakılacak yer                                                                            |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Derleme yarıda kesiliyor                                                | Docker'a ayrılan bellek (Docker Desktop → Settings → Resources); en az 6–8 GB verin      |
+| "port is already allocated"                                             | Port dolu; `.env` içinde `LISTEN_HTTP_PORT`/`LISTEN_HTTPS_PORT` ve `WEB_URL` değerleri   |
+| Arayüzde metin yerine anahtarlar görünüyor (`general_board.title` gibi) | Eski bir derleme; `git pull` sonrası `docker compose up -d --build` ile yeniden derleyin |
+| Sayfa açılıyor, giriş yapılamıyor                                       | `.env` içindeki `WEB_URL` ve `CORS_ALLOWED_ORIGINS` tarayıcıdaki adresle birebir aynı mı |
+| Zitadel'den dönüşte hata                                                | Yönlendirme adresi ve Issuer URL; kullanıcının e-postası Zitadel'de doğrulanmış mı       |
+| `api` sürekli yeniden başlıyor                                          | `docker compose logs api` ve `docker compose logs migrator`                              |
+| Dosya eklenemiyor                                                       | `docker compose logs plane-minio`; `.env` içindeki depolama anahtarları değişmiş mi      |
+| Bildirim/etkinlik kayıtları oluşmuyor                                   | `docker compose logs worker` ve `docker compose logs plane-mq`                           |
 
 Kök dizindeki `docker-compose.yml` ve `setup.sh` Plane'in geliştirme amaçlı dosyalarıdır; kurulum için `deployments/volta` kullanılır.
