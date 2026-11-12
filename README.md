@@ -12,14 +12,16 @@ Volta Motor iş takip uygulaması. Açık kaynak [Plane](https://github.com/make
 
 Kod GNU AGPL-3.0 lisansı altındadır; bkz. `LICENSE.txt` ve `COPYRIGHT.txt`. Plane'e ait telif ve lisans bildirimleri korunmalıdır.
 
-## Planlanan değişiklikler
+## Plane'e eklenenler
 
-1. Uygulama adı ve Volta görünümü
-2. Zitadel ile giriş (OIDC): eklendi, kurulum için `docs/zitadel-giris.md`
-3. Genel board: tüm projelerin işleri tek board'da, kartta proje etiketi
-4. İş türleri ve Azure Boards tarzı alanlar (kabul kriterleri vb.)
-5. Faaliyet raporları ekranı
+1. Uygulama adı, Volta logosu ve renkleri
+2. Zitadel ile giriş (OIDC); kurulum için `docs/zitadel-giris.md`
+3. Genel board: tüm projelerin işleri tek board'da, kartta proje etiketi ve iş türü
+4. İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik) ve iş öğelerinde kabul kriterleri listesi
+5. Faaliyet raporları ekranı: seçilen ayda tamamlanan ve devam eden işler, proje bazında
+
+Plane'de bulunmayan arka uç eklemeleri `apps/api/plane/todolist` uygulamasında durur; kendi migration'ları vardır ve Plane'in migration zinciriyle çakışmaz.
 
 ## Çalıştırma
 
-Kurulum adımları için şimdilik `PLANE_README.md` ve `deployments/` klasörüne bakın. Servisler `docker-compose.yml` içinde tanımlıdır.
+Kurulum, güncelleme ve yedekleme adımları `docs/devreye-alma.md` belgesindedir. Servisler `docker-compose.yml` içinde tanımlıdır ve imajlar bu depodaki koddan derlenir.
