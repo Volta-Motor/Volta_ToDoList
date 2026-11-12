@@ -12,13 +12,13 @@ from plane.app.permissions import ProjectEntityPermission, WorkspaceEntityPermis
 from plane.app.views.base import BaseAPIView, BaseViewSet
 from plane.db.models import Issue, Workspace
 
-from .models import IssueAcceptanceCriterion
+from .models import CriterionKind, IssueAcceptanceCriterion
 from .serializers import IssueAcceptanceCriterionSerializer, WorkItemTypeSerializer
 from .work_item_types import ensure_default_work_item_types, work_item_types_for
 
 
 class IssueAcceptanceCriterionViewSet(BaseViewSet):
-    """Bir iş öğesinin kabul kriterleri.
+    """Bir iş öğesinin kabul ve test kriterleri (`kind` alanıyla ayrılır).
 
     İş bağlantılarıyla (issue links) aynı yetki kuralları geçerlidir: proje
     üyeleri okuyabilir, yönetici ve üyeler değiştirebilir, kısıtlı misafirler
@@ -63,7 +63,14 @@ class IssueAcceptanceCriterionViewSet(BaseViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         extra = {}
         if "sort_order" not in request.data:
-            last = self.get_queryset().order_by("-sort_order").values_list("sort_order", flat=True).first()
+            kind = serializer.validated_data.get("kind", CriterionKind.ACCEPTANCE)
+            last = (
+                self.get_queryset()
+                .filter(kind=kind)
+                .order_by("-sort_order")
+                .values_list("sort_order", flat=True)
+                .first()
+            )
             extra["sort_order"] = (last or 0) + 10000
         serializer.save(project_id=project_id, issue_id=issue_id, **extra)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

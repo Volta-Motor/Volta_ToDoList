@@ -15,8 +15,15 @@ from .models import IssueAcceptanceCriterion
 class IssueAcceptanceCriterionSerializer(BaseSerializer):
     class Meta:
         model = IssueAcceptanceCriterion
-        fields = ["id", "issue", "text", "is_done", "sort_order", "created_at", "updated_at"]
+        fields = ["id", "issue", "kind", "text", "is_done", "sort_order", "created_at", "updated_at"]
         read_only_fields = ["id", "issue", "created_at", "updated_at"]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        # A criterion stays in the list it was added to.
+        if self.instance is not None:
+            fields["kind"].read_only = True
+        return fields
 
     def validate_text(self, value):
         value = value.strip()

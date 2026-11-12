@@ -13,6 +13,7 @@ import { StateGroupIcon } from "@plane/blocks/icons";
 import { useTranslation } from "@plane/i18n";
 import type { TIssue, TStateGroups } from "@plane/types";
 import { cn } from "@plane/utils";
+import { useStoryPoints } from "@/components/story-points/use-story-points";
 // hooks
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useMember } from "@/hooks/store/use-member";
@@ -53,6 +54,7 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
     setAssignees,
   } = useGeneralBoard(workspaceSlug);
   const { isCreateIssueModalOpen } = useCommandPalette();
+  const { getStoryPoints, sumStoryPoints } = useStoryPoints(workspaceSlug);
   // state
   const [projectFilter, setProjectFilter] = useState<string>(ALL);
   const [assigneeFilter, setAssigneeFilter] = useState<string>(ALL);
@@ -189,6 +191,7 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
       <div className="flex min-h-0 flex-1 items-stretch gap-4 overflow-x-auto px-5 py-4">
         {GENERAL_BOARD_GROUPS.map((group) => {
           const groupItems = itemsByGroup[group];
+          const groupPoints = sumStoryPoints(groupItems);
           return (
             <section
               key={group}
@@ -212,6 +215,14 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
                 <StateGroupIcon stateGroup={group} />
                 <h2 className="text-body-sm-medium text-primary">{t(`general_board.groups.${group}`)}</h2>
                 <span className="text-body-xs-medium text-tertiary">{groupItems.length}</span>
+                {groupPoints > 0 && (
+                  <span
+                    title={t("story_points.column_total")}
+                    className="ml-auto text-caption-sm-medium whitespace-nowrap text-secondary"
+                  >
+                    {t("story_points.value", { points: groupPoints })}
+                  </span>
+                )}
               </header>
               <div className="vertical-scrollbar scrollbar-sm flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2">
                 {groupItems.map((item) => (
@@ -220,6 +231,7 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
                     item={item}
                     workspaceSlug={workspaceSlug}
                     projectTag={projectTags.tags[item.project_id ?? ""] ?? getProjectTag("?", 0)}
+                    storyPoints={getStoryPoints(item)}
                     isEditable={canEdit(item.project_id)}
                     isDragging={draggedItem?.id === item.id}
                     onDragStart={setDraggedItem}

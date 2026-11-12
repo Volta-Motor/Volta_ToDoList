@@ -18,9 +18,13 @@ export type TWorkItemType = {
   level: number;
 };
 
+/** A work item keeps two checklists in the same table: acceptance criteria and test criteria. */
+export type TCriterionKind = "acceptance" | "test";
+
 export type TAcceptanceCriterion = {
   id: string;
   issue: string;
+  kind: TCriterionKind;
   text: string;
   is_done: boolean;
   sort_order: number;
@@ -56,7 +60,7 @@ export class TodoListService extends APIService {
     workspaceSlug: string,
     projectId: string,
     issueId: string,
-    data: Pick<TAcceptanceCriterion, "text">
+    data: Pick<TAcceptanceCriterion, "text" | "kind">
   ): Promise<TAcceptanceCriterion> {
     const response = await this.post(this.criteriaUrl(workspaceSlug, projectId, issueId), data);
     return response?.data;

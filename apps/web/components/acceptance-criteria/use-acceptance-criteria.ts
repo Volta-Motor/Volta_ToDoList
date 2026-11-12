@@ -4,22 +4,27 @@
  * See the LICENSE file for details.
  */
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 // plane imports
 import { setToast } from "@plane/blocks/toast";
 import { useTranslation } from "@plane/i18n";
 // services
 import { TodoListService } from "@/services/todolist.service";
-import type { TAcceptanceCriterion } from "@/services/todolist.service";
+import type { TAcceptanceCriterion, TCriterionKind } from "@/services/todolist.service";
 
 const todoListService = new TodoListService();
 
 /**
- * The acceptance criteria of one work item. Changes show at once and are rolled back with a
+ * One of the two criteria lists (acceptance or test) of a work item. Changes show at once and are rolled back with a
  * message when the server refuses them.
  */
-export const useAcceptanceCriteria = (workspaceSlug: string, projectId: string, issueId: string) => {
+export const useAcceptanceCriteria = (
+  workspaceSlug: string,
+  projectId: string,
+  issueId: string,
+  kind: TCriterionKind
+) => {
   const { t } = useTranslation();
   const { data, error, mutate } = useSWR(
     `ACCEPTANCE_CRITERIA_${workspaceSlug}_${projectId}_${issueId}`,
@@ -32,7 +37,10 @@ export const useAcceptanceCriteria = (workspaceSlug: string, projectId: string, 
   const addCriterion = useCallback(
     async (text: string): Promise<boolean> => {
       try {
-        const created = await todoListService.createAcceptanceCriterion(workspaceSlug, projectId, issueId, { text });
+        const created = await todoListService.createAcceptanceCriterion(workspaceSlug, projectId, issueId, {
+          text,
+          kind,
+        });
         await mutate((current) => [...(current ?? []), created], { revalidate: false });
         return true;
       } catch {
@@ -40,7 +48,7 @@ export const useAcceptanceCriteria = (workspaceSlug: string, projectId: string, 
         return false;
       }
     },
-    [workspaceSlug, projectId, issueId, mutate, showSaveError]
+    [workspaceSlug, projectId, issueId, kind, mutate, showSaveError]
   );
 
   const updateCriterion = useCallback(
@@ -83,8 +91,11 @@ export const useAcceptanceCriteria = (workspaceSlug: string, projectId: string, 
     [workspaceSlug, projectId, issueId, mutate, showSaveError]
   );
 
+  // Both lists of the work item come in one response; this hook hands out the one asked for.
+  const criteria = useMemo(() => (data ?? []).filter((item) => item.kind === kind), [data, kind]);
+
   return {
-    criteria: data ?? [],
+    criteria,
     isLoading: !data && !error,
     hasError: Boolean(error),
     addCriterion,

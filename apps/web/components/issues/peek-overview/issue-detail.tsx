@@ -195,6 +195,14 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
         projectId={issue.project_id}
         issueId={issueId}
         disabled={disabled || isArchived}
+        kind="acceptance"
+      />
+      <AcceptanceCriteriaRoot
+        workspaceSlug={workspaceSlug}
+        projectId={issue.project_id}
+        issueId={issueId}
+        disabled={disabled || isArchived}
+        kind="test"
       />
     </div>
   );

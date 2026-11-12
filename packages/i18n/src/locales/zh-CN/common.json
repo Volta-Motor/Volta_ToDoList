@@ -1,4 +1,15 @@
 {
+  "test_criteria": {
+    "title": "Test criteria",
+    "progress": "{done}/{total} passed",
+    "add_placeholder": "Type a test criterion and press Enter"
+  },
+  "story_points": {
+    "label": "Story points",
+    "value": "{points} SP",
+    "column_total": "Total story points in this column",
+    "completed_total": "{points} SP completed"
+  },
   "acceptance_criteria": {
     "title": "Acceptance criteria",
     "progress": "{done}/{total} done",

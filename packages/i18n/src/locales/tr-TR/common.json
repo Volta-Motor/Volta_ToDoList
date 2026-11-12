@@ -1,12 +1,23 @@
 {
+  "test_criteria": {
+    "title": "Test kriterleri",
+    "progress": "{done}/{total} geçti",
+    "add_placeholder": "Test kriteri yazıp Enter'a basın"
+  },
+  "story_points": {
+    "label": "Story point",
+    "value": "{points} SP",
+    "column_total": "Sütundaki toplam story point",
+    "completed_total": "{points} SP tamamlandı"
+  },
   "acceptance_criteria": {
     "title": "Kabul kriterleri",
     "progress": "{done}/{total} tamamlandı",
     "add_placeholder": "Kriter yazıp Enter'a basın",
     "edit": "Kriter metnini düzenle",
     "delete": "Kriteri sil",
-    "load_error": "Kabul kriterleri yüklenemedi.",
-    "save_error": "Kabul kriteri kaydedilemedi"
+    "load_error": "Kriterler yüklenemedi.",
+    "save_error": "Kriter kaydedilemedi"
   },
   "work_item_types": {
     "none": "Tür yok",
@@ -518,7 +529,7 @@
     "none": "Yok",
     "link": "Bağlantı",
     "estimates": "Tahminler",
-    "estimate": "Tahmin",
+    "estimate": "Story point",
     "created_at": "Oluşturulma tarihi",
     "updated_at": "Güncelleme tarihi",
     "completed_at": "Tamamlanma tarihi",

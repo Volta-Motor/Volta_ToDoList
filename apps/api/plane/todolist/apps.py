@@ -15,3 +15,6 @@ class TodoListConfig(AppConfig):
 
     name = "plane.todolist"
     label = "todolist"
+
+    def ready(self):
+        from . import signals  # noqa: F401

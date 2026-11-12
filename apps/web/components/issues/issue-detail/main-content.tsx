@@ -230,6 +230,15 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
         issueId={issueId}
         disabled={!isEditable || isArchived}
         className="pb-6"
+        kind="acceptance"
+      />
+      <AcceptanceCriteriaRoot
+        workspaceSlug={workspaceSlug}
+        projectId={projectId}
+        issueId={issueId}
+        disabled={!isEditable || isArchived}
+        className="pb-6"
+        kind="test"
       />
 
       <IssueDetailWidgets
