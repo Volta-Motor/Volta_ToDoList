@@ -1,4 +1,18 @@
 {
+  "acceptance_criteria": {
+    "title": "Acceptance criteria",
+    "progress": "{done}/{total} done",
+    "add_placeholder": "Type a criterion and press Enter",
+    "edit": "Edit criterion text",
+    "delete": "Delete criterion",
+    "load_error": "Acceptance criteria could not be loaded.",
+    "save_error": "The acceptance criterion could not be saved"
+  },
+  "work_item_types": {
+    "none": "No type",
+    "change": "Change work item type",
+    "update_error": "The work item type could not be updated"
+  },
   "activity_reports": {
     "title": "Activity reports",
     "period": "Period",

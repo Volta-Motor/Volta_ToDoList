@@ -13,6 +13,8 @@ import type { TIssue } from "@plane/types";
 import { cn, generateWorkItemLink } from "@plane/utils";
 // components
 import { MemberSelect } from "@/components/dropdowns/member/member-select";
+import { WorkItemTypeBadge } from "@/components/work-item-types/type-badge";
+import { useWorkItemTypes } from "@/components/work-item-types/use-work-item-types";
 // hooks
 import { useProject } from "@/hooks/store/use-project";
 // local imports
@@ -36,8 +38,11 @@ export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props)
   const { getProjectById } = useProject();
   // translation
   const { t, currentLocale } = useTranslation();
+  // data
+  const { getTypeById } = useWorkItemTypes(workspaceSlug);
   // derived values
   const project = getProjectById(item.project_id);
+  const workItemType = getTypeById(item.type_id);
   const workItemKey = `${project?.identifier ?? ""}-${item.sequence_id}`;
   const workItemLink = generateWorkItemLink({
     workspaceSlug,
@@ -70,6 +75,7 @@ export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props)
     >
       <div className="flex items-center gap-2">
         <ProjectTag tag={projectTag} title={project?.name} />
+        {workItemType && <WorkItemTypeBadge type={workItemType} className="text-caption-sm-medium text-secondary" />}
         <span className="ml-auto text-caption-sm-regular whitespace-nowrap text-tertiary">{workItemKey}</span>
       </div>
 

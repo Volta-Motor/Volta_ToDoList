@@ -112,6 +112,8 @@ INSTALLED_APPS = [
     "plane.license",
     "plane.api",
     "plane.authentication",
+    # TO DO List additions (kept apart from Plane's own apps)
+    "plane.todolist",
     # Third-party things
     "rest_framework",
     "corsheaders",

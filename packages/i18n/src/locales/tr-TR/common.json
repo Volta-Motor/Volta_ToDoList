@@ -1,4 +1,18 @@
 {
+  "acceptance_criteria": {
+    "title": "Kabul kriterleri",
+    "progress": "{done}/{total} tamamlandı",
+    "add_placeholder": "Kriter yazıp Enter'a basın",
+    "edit": "Kriter metnini düzenle",
+    "delete": "Kriteri sil",
+    "load_error": "Kabul kriterleri yüklenemedi.",
+    "save_error": "Kabul kriteri kaydedilemedi"
+  },
+  "work_item_types": {
+    "none": "Tür yok",
+    "change": "İş türünü değiştir",
+    "update_error": "İş türü güncellenemedi"
+  },
   "activity_reports": {
     "title": "Faaliyet raporları",
     "period": "Dönem",
