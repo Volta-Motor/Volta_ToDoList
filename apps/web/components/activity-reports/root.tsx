@@ -17,6 +17,7 @@ import { copyTextToClipboard, generateWorkItemLink } from "@plane/utils";
 // components
 import { FilterChip } from "@/components/general-board/filter-chip";
 import { getProjectTag, ProjectTag } from "@/components/general-board/project-tag";
+import { useStoryPoints } from "@/components/story-points/use-story-points";
 // hooks
 import { useMember } from "@/hooks/store/use-member";
 import { useProject } from "@/hooks/store/use-project";
@@ -48,6 +49,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
     reportMonth,
     isCurrentMonth
   );
+  const { getStoryPoints, sumStoryPoints } = useStoryPoints(workspaceSlug);
 
   const monthLabel = (year: number, month: number) =>
     new Intl.DateTimeFormat(currentLocale, { month: "long", year: "numeric" }).format(new Date(year, month, 1));
@@ -68,6 +70,11 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
   );
 
   const getKey = (item: TIssue) => `${getProjectById(item.project_id)?.identifier ?? ""}-${item.sequence_id}`;
+  /** Text added to a report line for the story points of a work item (empty when it has none). */
+  const getPointsText = (item: TIssue) => {
+    const points = getStoryPoints(item);
+    return points === undefined ? "" : `, ${t("story_points.value", { points })}`;
+  };
   const getAssignees = (item: TIssue) =>
     (item.assignee_ids ?? [])
       .map((id) => getUserDetails(id)?.display_name)
@@ -89,6 +96,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
     );
   const completedCount = sections.reduce((total, section) => total + section.completed.length, 0);
   const inProgressCount = sections.reduce((total, section) => total + section.inProgress.length, 0);
+  const completedPoints = sections.reduce((total, section) => total + sumStoryPoints(section.completed), 0);
 
   const buildReportText = () => {
     const lines: string[] = [
@@ -100,12 +108,16 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
       if (section.completed.length > 0) {
         lines.push(t("activity_reports.completed"));
         section.completed.forEach((item) =>
-          lines.push(`- ${getKey(item)} ${item.name} (${getAssignees(item)}, ${formatDate(item.completed_at)})`)
+          lines.push(
+            `- ${getKey(item)} ${item.name} (${getAssignees(item)}, ${formatDate(item.completed_at)}${getPointsText(item)})`
+          )
         );
       }
       if (section.inProgress.length > 0) {
         lines.push(t("activity_reports.in_progress"));
-        section.inProgress.forEach((item) => lines.push(`- ${getKey(item)} ${item.name} (${getAssignees(item)})`));
+        section.inProgress.forEach((item) =>
+          lines.push(`- ${getKey(item)} ${item.name} (${getAssignees(item)}${getPointsText(item)})`)
+        );
       }
       lines.push("");
     });
@@ -151,6 +163,11 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
             >
               {item.name}
             </Link>
+            {getStoryPoints(item) !== undefined && (
+              <span className="text-caption-sm-medium whitespace-nowrap text-secondary">
+                {t("story_points.value", { points: getStoryPoints(item) })}
+              </span>
+            )}
             <span className="text-caption-sm-regular text-secondary">{getAssignees(item)}</span>
             {showCompletedDate && (
               <span className="w-24 text-right text-caption-sm-regular whitespace-nowrap text-tertiary">
@@ -187,6 +204,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
           </select>
           <span className="text-body-sm-regular text-secondary">
             {t("activity_reports.summary", { completed: completedCount, in_progress: inProgressCount })}
+            {completedPoints > 0 && ` · ${t("story_points.completed_total", { points: completedPoints })}`}
           </span>
           <div className="ml-auto">
             <Button

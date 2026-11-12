@@ -9,10 +9,20 @@ from django.db import models
 from plane.db.models.project import ProjectBaseModel
 
 
+class CriterionKind(models.TextChoices):
+    ACCEPTANCE = "acceptance", "Acceptance"
+    TEST = "test", "Test"
+
+
 class IssueAcceptanceCriterion(ProjectBaseModel):
-    """Bir iş öğesinin kabul kriterleri listesindeki tek bir madde."""
+    """Bir iş öğesinin kabul ya da test kriterleri listesindeki tek bir madde.
+
+    İki liste aynı tabloda tutulur ve `kind` alanıyla ayrılır. Tablo adı ilk
+    sürümden kalmadır; yalnızca kabul kriterleriyle başlamıştı.
+    """
 
     issue = models.ForeignKey("db.Issue", on_delete=models.CASCADE, related_name="acceptance_criteria")
+    kind = models.CharField(max_length=20, choices=CriterionKind.choices, default=CriterionKind.ACCEPTANCE)
     text = models.CharField(max_length=500)
     is_done = models.BooleanField(default=False)
     sort_order = models.FloatField(default=65535)

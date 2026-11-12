@@ -17,8 +17,9 @@ Kod GNU AGPL-3.0 lisansı altındadır; bkz. `LICENSE.txt` ve `COPYRIGHT.txt`. P
 1. Uygulama adı, Volta logosu ve renkleri
 2. Zitadel ile giriş (OIDC); kurulum için `docs/zitadel-giris.md`
 3. Genel board: tüm projelerin işleri tek board'da, kartta proje etiketi ve iş türü
-4. İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik) ve iş öğelerinde kabul kriterleri listesi
-5. Faaliyet raporları ekranı: seçilen ayda tamamlanan ve devam eden işler, proje bazında
+4. İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik); iş öğelerinde kabul kriterleri ve test kriterleri listeleri
+5. Story point: her projede Fibonacci (1, 2, 3, 5, 8, 13, 21) puan sistemi kendiliğinden tanımlı; kartta, sütun toplamında ve raporda görünür
+6. Faaliyet raporları ekranı: seçilen ayda tamamlanan ve devam eden işler, proje bazında
 
 Plane'de bulunmayan arka uç eklemeleri `apps/api/plane/todolist` uygulamasında durur; kendi migration'ları vardır ve Plane'in migration zinciriyle çakışmaz.
 

@@ -1,12 +1,23 @@
 {
+  "test_criteria": {
+    "title": "Test criteria",
+    "progress": "{done}/{total} passed",
+    "add_placeholder": "Type a test criterion and press Enter"
+  },
+  "story_points": {
+    "label": "Story points",
+    "value": "{points} SP",
+    "column_total": "Total story points in this column",
+    "completed_total": "{points} SP completed"
+  },
   "acceptance_criteria": {
     "title": "Acceptance criteria",
     "progress": "{done}/{total} done",
     "add_placeholder": "Type a criterion and press Enter",
     "edit": "Edit criterion text",
     "delete": "Delete criterion",
-    "load_error": "Acceptance criteria could not be loaded.",
-    "save_error": "The acceptance criterion could not be saved"
+    "load_error": "The criteria could not be loaded.",
+    "save_error": "The criterion could not be saved"
   },
   "work_item_types": {
     "none": "No type",
@@ -518,7 +529,7 @@
     "none": "None",
     "link": "Link",
     "estimates": "Estimates",
-    "estimate": "Estimate",
+    "estimate": "Story points",
     "created_at": "Created at",
     "updated_at": "Updated at",
     "completed_at": "Completed at",

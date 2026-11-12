@@ -66,6 +66,35 @@ class TestAcceptanceCriteria:
         assert listed.status_code == status.HTTP_200_OK
         assert [item["text"] for item in listed.data] == ["İlk kriter", "İkinci kriter"]
 
+    def test_test_criteria_are_a_separate_list(self, session_client, workspace, project, foreign_issue):
+        url = _url(workspace, project, foreign_issue)
+        session_client.post(url, {"text": "Kabul 1"}, format="json")
+        first_test = session_client.post(url, {"text": "Test 1", "kind": "test"}, format="json")
+        session_client.post(url, {"text": "Kabul 2"}, format="json")
+        second_test = session_client.post(url, {"text": "Test 2", "kind": "test"}, format="json")
+
+        assert first_test.status_code == status.HTTP_201_CREATED
+        assert first_test.data["kind"] == "test"
+        # Each list is ordered on its own.
+        assert second_test.data["sort_order"] > first_test.data["sort_order"]
+
+        listed = session_client.get(url).data
+        assert [item["text"] for item in listed if item["kind"] == "acceptance"] == ["Kabul 1", "Kabul 2"]
+        assert [item["text"] for item in listed if item["kind"] == "test"] == ["Test 1", "Test 2"]
+
+    def test_unknown_kind_is_rejected(self, session_client, workspace, project, foreign_issue):
+        response = session_client.post(
+            _url(workspace, project, foreign_issue), {"text": "x", "kind": "other"}, format="json"
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_kind_cannot_be_changed(self, session_client, workspace, project, foreign_issue, criterion):
+        detail = _url(workspace, project, foreign_issue, criterion.id)
+        session_client.patch(detail, {"kind": "test", "is_done": True}, format="json")
+        criterion.refresh_from_db()
+        assert criterion.kind == "acceptance"
+        assert criterion.is_done is True
+
     def test_empty_text_is_rejected(self, session_client, workspace, project, foreign_issue):
         response = session_client.post(_url(workspace, project, foreign_issue), {"text": "   "}, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST

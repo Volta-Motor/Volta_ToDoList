@@ -8,6 +8,8 @@ import { useState } from "react";
 // plane imports
 import { useTranslation } from "@plane/i18n";
 import { cn } from "@plane/utils";
+// services
+import type { TCriterionKind } from "@/services/todolist.service";
 // local imports
 import { AcceptanceCriterionItem } from "./item";
 import { useAcceptanceCriteria } from "./use-acceptance-criteria";
@@ -17,12 +19,20 @@ type Props = {
   projectId: string;
   issueId: string;
   disabled: boolean;
+  /** Which of the two lists to show. */
+  kind: TCriterionKind;
   className?: string;
 };
 
-/** The acceptance criteria checklist shown under the description of a work item. */
+/** Translation key prefix of each list. */
+const I18N_PREFIX: Record<TCriterionKind, string> = {
+  acceptance: "acceptance_criteria",
+  test: "test_criteria",
+};
+
+/** A criteria checklist (acceptance or test) shown under the description of a work item. */
 export function AcceptanceCriteriaRoot(props: Props) {
-  const { workspaceSlug, projectId, issueId, disabled, className } = props;
+  const { workspaceSlug, projectId, issueId, disabled, kind, className } = props;
   // states
   const [newText, setNewText] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -32,8 +42,11 @@ export function AcceptanceCriteriaRoot(props: Props) {
   const { criteria, isLoading, hasError, addCriterion, updateCriterion, removeCriterion } = useAcceptanceCriteria(
     workspaceSlug,
     projectId,
-    issueId
+    issueId,
+    kind
   );
+  const i18nPrefix = I18N_PREFIX[kind];
+  const headingId = `${kind}-criteria-${issueId}`;
   const doneCount = criteria.filter((criterion) => criterion.is_done).length;
 
   const handleAdd = async () => {
@@ -51,14 +64,14 @@ export function AcceptanceCriteriaRoot(props: Props) {
   if (disabled && !isLoading && !hasError && criteria.length === 0) return null;
 
   return (
-    <section aria-labelledby={`acceptance-criteria-${issueId}`} className={cn("flex flex-col gap-2", className)}>
+    <section aria-labelledby={headingId} className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-center gap-2">
-        <h3 id={`acceptance-criteria-${issueId}`} className="text-body-sm-semibold text-primary">
-          {t("acceptance_criteria.title")}
+        <h3 id={headingId} className="text-body-sm-semibold text-primary">
+          {t(`${i18nPrefix}.title`)}
         </h3>
         {criteria.length > 0 && (
           <span className="text-caption-md-regular text-tertiary">
-            {t("acceptance_criteria.progress", { done: doneCount, total: criteria.length })}
+            {t(`${i18nPrefix}.progress`, { done: doneCount, total: criteria.length })}
           </span>
         )}
       </div>
@@ -86,8 +99,8 @@ export function AcceptanceCriteriaRoot(props: Props) {
           value={newText}
           maxLength={500}
           disabled={isAdding}
-          placeholder={t("acceptance_criteria.add_placeholder")}
-          aria-label={t("acceptance_criteria.add_placeholder")}
+          placeholder={t(`${i18nPrefix}.add_placeholder`)}
+          aria-label={t(`${i18nPrefix}.add_placeholder`)}
           className="h-8 rounded-sm border border-subtle bg-surface-1 px-2.5 text-body-sm-regular text-primary outline-none placeholder:text-placeholder focus:border-accent-strong"
           onChange={(event) => setNewText(event.target.value)}
           onKeyDown={(event) => {

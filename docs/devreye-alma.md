@@ -87,7 +87,7 @@ Kurulum `todolist` proje adıyla çalışır; konteyner ve veri birimi adları P
 
 ## Veritabanı
 
-Veritabanı boş başlar; `migrator` servisi tabloları kendisi kurar. Plane'in tablolarına ek olarak kabul kriterleri için `issue_acceptance_criteria` tablosu oluşur (`plane.todolist` uygulaması). İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik) her çalışma alanında ilk kullanımda kendiliğinden tanımlanır.
+Veritabanı boş başlar; `migrator` servisi tabloları kendisi kurar. Plane'in tablolarına ek olarak kabul ve test kriterleri için `issue_acceptance_criteria` tablosu oluşur (`plane.todolist` uygulaması). İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik) her çalışma alanında ilk kullanımda kendiliğinden tanımlanır. Her yeni proje Fibonacci story point sistemiyle açılır; var olan projelere güncelleme sırasında `migrator` ekler.
 
 ## Güncelleme
 

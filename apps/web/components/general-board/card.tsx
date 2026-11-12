@@ -25,6 +25,8 @@ type Props = {
   item: TIssue;
   workspaceSlug: string;
   projectTag: TProjectTag;
+  /** Story points of the work item, when it has any. */
+  storyPoints: number | undefined;
   isEditable: boolean;
   isDragging: boolean;
   onDragStart: (item: TIssue) => void;
@@ -33,7 +35,17 @@ type Props = {
 };
 
 export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props) {
-  const { item, workspaceSlug, projectTag, isEditable, isDragging, onDragStart, onDragEnd, onAssigneesChange } = props;
+  const {
+    item,
+    workspaceSlug,
+    projectTag,
+    storyPoints,
+    isEditable,
+    isDragging,
+    onDragStart,
+    onDragEnd,
+    onAssigneesChange,
+  } = props;
   // store hooks
   const { getProjectById } = useProject();
   // translation
@@ -87,12 +99,20 @@ export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props)
         {item.name}
       </Link>
 
-      {(priority || targetDate) && (
+      {(priority || targetDate || storyPoints !== undefined) && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption-sm-regular text-secondary">
           {priority && (
             <span className="inline-flex items-center gap-1">
               <PriorityIcon priority={priority} className="size-3.5" />
               {t(`issue.priority.${priority}`)}
+            </span>
+          )}
+          {storyPoints !== undefined && (
+            <span
+              title={t("story_points.label")}
+              className="rounded-sm bg-layer-2 px-1.5 py-0.5 text-caption-sm-medium whitespace-nowrap text-primary"
+            >
+              {t("story_points.value", { points: storyPoints })}
             </span>
           )}
           {targetDate && <span className="ml-auto whitespace-nowrap">{targetDate}</span>}
