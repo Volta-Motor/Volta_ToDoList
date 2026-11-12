@@ -24,4 +24,12 @@ Plane'de bulunmayan arka uç eklemeleri `apps/api/plane/todolist` uygulamasında
 
 ## Çalıştırma
 
-Kurulum, güncelleme ve yedekleme adımları `docs/devreye-alma.md` belgesindedir. Servisler `docker-compose.yml` içinde tanımlıdır ve imajlar bu depodaki koddan derlenir.
+Kurulum dosyaları `deployments/volta` klasöründedir; imajlar bu depodaki koddan derlenir.
+
+```bash
+cd deployments/volta
+./hazirla.sh
+docker compose up -d --build
+```
+
+Yerelde deneme, sunucuya kurulum, güncelleme ve yedekleme adımları `docs/devreye-alma.md` belgesindedir.
