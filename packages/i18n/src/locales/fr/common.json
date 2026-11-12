@@ -1,4 +1,31 @@
 {
+  "activity_reports": {
+    "title": "Activity reports",
+    "period": "Period",
+    "project": "Project",
+    "all": "All",
+    "unassigned": "Unassigned",
+    "summary": "{completed} completed · {in_progress} in progress",
+    "completed": "Completed this month",
+    "in_progress": "In progress now",
+    "copy": "Copy report text",
+    "loading": "Loading",
+    "empty": "No work to report for this period and filter",
+    "load_failed": "The report could not be loaded. Reload the page to try again.",
+    "past_month_note": "For past months only completed work is shown; what was in progress at the time is not recorded.",
+    "truncated": "There is more work than this page can show. Filter by project to narrow it down.",
+    "copied": {
+      "title": "Copied",
+      "message": "The report text is on your clipboard."
+    },
+    "copy_failed": {
+      "title": "Could not copy",
+      "message": "Your browser blocked access to the clipboard."
+    },
+    "text": {
+      "heading": "{month} activity summary"
+    }
+  },
   "general_board": {
     "title": "Board",
     "project": "Project",

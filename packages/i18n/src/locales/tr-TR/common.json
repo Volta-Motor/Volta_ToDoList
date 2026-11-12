@@ -1,4 +1,31 @@
 {
+  "activity_reports": {
+    "title": "Faaliyet raporları",
+    "period": "Dönem",
+    "project": "Proje",
+    "all": "Tümü",
+    "unassigned": "Atanmamış",
+    "summary": "{completed} tamamlandı · {in_progress} devam ediyor",
+    "completed": "Bu ay tamamlanan işler",
+    "in_progress": "Şu an devam eden işler",
+    "copy": "Rapor metnini kopyala",
+    "loading": "Yükleniyor",
+    "empty": "Bu dönem ve filtre için raporlanacak iş yok",
+    "load_failed": "Rapor yüklenemedi. Yeniden denemek için sayfayı yenileyin.",
+    "past_month_note": "Geçmiş aylarda yalnızca tamamlanan işler gösterilir; o tarihte devam eden işler kayıtlı değildir.",
+    "truncated": "Bu sayfanın gösterebileceğinden fazla iş var. Daraltmak için projeye göre süzün.",
+    "copied": {
+      "title": "Kopyalandı",
+      "message": "Rapor metni panoya alındı."
+    },
+    "copy_failed": {
+      "title": "Kopyalanamadı",
+      "message": "Tarayıcınız panoya erişime izin vermedi."
+    },
+    "text": {
+      "heading": "{month} faaliyet özeti"
+    }
+  },
   "general_board": {
     "title": "Board",
     "project": "Proje",
