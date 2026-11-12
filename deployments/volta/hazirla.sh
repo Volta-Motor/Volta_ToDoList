@@ -47,7 +47,8 @@ set_value() {
   rm -f "$tmp"
 }
 
-cp ornek.env .env
+# Windows'ta dosya CRLF satır sonlarıyla inebilir; .env her zaman LF ile yazılır.
+tr -d '\r' < ornek.env > .env
 
 db_password="$(random 32)"
 mq_password="$(random 32)"
