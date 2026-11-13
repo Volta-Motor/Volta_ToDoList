@@ -9,7 +9,6 @@ import { sortBy } from "lodash-es";
 import { observer } from "mobx-react";
 // plane imports
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
-import { StateGroupIcon } from "@plane/blocks/icons";
 import { useTranslation } from "@plane/i18n";
 import type { TIssue, TStateGroups } from "@plane/types";
 import { cn } from "@plane/utils";
@@ -22,6 +21,8 @@ import { useUserPermissions } from "@/hooks/store/user";
 // local imports
 import { GeneralBoardCard } from "./card";
 import { FilterChip } from "./filter-chip";
+import { FlowStrip } from "./flow-strip";
+import { GROUP_COLORS, tint } from "./palette";
 import type { TProjectTag } from "./project-tag";
 import { getProjectTag, ProjectTag } from "./project-tag";
 import { CLOSED_ITEMS_LIMIT, GENERAL_BOARD_GROUPS, useGeneralBoard } from "./use-general-board";
@@ -115,6 +116,15 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
     return grouped;
   }, [visibleItems, getItemGroup]);
 
+  const countsByGroup = useMemo(
+    () =>
+      Object.fromEntries(GENERAL_BOARD_GROUPS.map((group) => [group, itemsByGroup[group].length])) as Record<
+        TStateGroups,
+        number
+      >,
+    [itemsByGroup]
+  );
+
   const canEdit = (projectId: string | null | undefined) =>
     Boolean(projectId) &&
     allowPermissions(
@@ -140,11 +150,10 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-surface-1">
-      <div className="flex flex-shrink-0 flex-col gap-2 border-b border-subtle px-5 py-3">
+      <div className="flex flex-shrink-0 flex-col gap-2.5 border-b border-subtle px-5 py-3">
+        <FlowStrip groups={GENERAL_BOARD_GROUPS} counts={countsByGroup} points={sumStoryPoints(visibleItems)} />
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("general_board.project")}>
-          <span className="w-16 text-caption-sm-medium tracking-wide text-tertiary uppercase">
-            {t("general_board.project")}
-          </span>
+          <span className="w-14 text-caption-md-medium text-tertiary">{t("general_board.project")}</span>
           <FilterChip isSelected={projectFilter === ALL} onClick={() => setProjectFilter(ALL)}>
             {t("general_board.all")}
           </FilterChip>
@@ -160,9 +169,7 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("general_board.assignee")}>
-          <span className="w-16 text-caption-sm-medium tracking-wide text-tertiary uppercase">
-            {t("general_board.assignee")}
-          </span>
+          <span className="w-14 text-caption-md-medium text-tertiary">{t("general_board.assignee")}</span>
           <FilterChip isSelected={assigneeFilter === ALL} onClick={() => setAssigneeFilter(ALL)}>
             {t("general_board.all")}
           </FilterChip>
@@ -192,6 +199,8 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
         {GENERAL_BOARD_GROUPS.map((group) => {
           const groupItems = itemsByGroup[group];
           const groupPoints = sumStoryPoints(groupItems);
+          const { color, onColor } = GROUP_COLORS[group];
+          const isDropTarget = dropTarget === group;
           return (
             <section
               key={group}
@@ -206,15 +215,26 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
                 event.preventDefault();
                 handleDrop(group);
               }}
+              // each column is tinted with its own color; the tint deepens while a card hovers over it
+              style={{
+                backgroundColor: tint(color, isDropTarget ? 16 : 6),
+                borderColor: isDropTarget ? color : "transparent",
+              }}
               className={cn(
-                "flex w-72 flex-shrink-0 flex-col rounded-lg border-2 border-transparent bg-layer-1",
-                dropTarget === group && "border-dashed border-accent-strong"
+                // columns share the width when there is room and scroll sideways when there is not
+                "flex min-w-60 flex-1 basis-0 flex-col overflow-hidden rounded-lg border-2 transition-colors duration-150",
+                isDropTarget && "border-dashed"
               )}
             >
+              <div aria-hidden className="h-1 flex-shrink-0" style={{ backgroundColor: color }} />
               <header className="flex flex-shrink-0 items-center gap-2 px-3 py-2.5">
-                <StateGroupIcon stateGroup={group} />
-                <h2 className="text-body-sm-medium text-primary">{t(`general_board.groups.${group}`)}</h2>
-                <span className="text-body-xs-medium text-tertiary">{groupItems.length}</span>
+                <h2 className="text-body-sm-semibold text-primary">{t(`general_board.groups.${group}`)}</h2>
+                <span
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-caption-sm-semibold"
+                  style={{ backgroundColor: color, color: onColor }}
+                >
+                  {groupItems.length}
+                </span>
                 {groupPoints > 0 && (
                   <span
                     title={t("story_points.column_total")}

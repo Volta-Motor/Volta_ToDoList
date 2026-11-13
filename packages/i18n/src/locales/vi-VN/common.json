@@ -58,6 +58,10 @@
     "all": "All",
     "unassigned": "Unassigned",
     "assignee_count": "{count} assignees",
+    "flow": {
+      "items": "{count} work items",
+      "done": "{percent}% done"
+    },
     "empty_column": "No work items in this filter",
     "loading": "Loading",
     "load_failed": "The board could not be loaded. Reload the page to try again.",
