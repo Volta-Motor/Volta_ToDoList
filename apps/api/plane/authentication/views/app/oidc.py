@@ -21,6 +21,7 @@ from plane.authentication.adapter.error import (
     AuthenticationException,
     AUTHENTICATION_ERROR_CODES,
 )
+from plane.utils.exception_logger import log_exception
 from plane.utils.path_validator import validate_next_path
 
 
@@ -112,6 +113,20 @@ class OIDCCallbackEndpoint(View):
             return HttpResponseRedirect(url)
         except AuthenticationException as e:
             params = e.get_error_dict()
+            if next_path:
+                params["next_path"] = str(validate_next_path(next_path))
+            url = urljoin(host, "?" + urlencode(params))
+            return HttpResponseRedirect(url)
+        except Exception as e:
+            # Anything unexpected on the way back from the provider. In production Django does not
+            # log unhandled view errors, so without this the only trace was a bare "Server Error
+            # (500)" page. Log it and send the user back to the login page with an error instead.
+            log_exception(e)
+            exc = AuthenticationException(
+                error_code=AUTHENTICATION_ERROR_CODES["OIDC_OAUTH_PROVIDER_ERROR"],
+                error_message="OIDC_OAUTH_PROVIDER_ERROR",
+            )
+            params = exc.get_error_dict()
             if next_path:
                 params["next_path"] = str(validate_next_path(next_path))
             url = urljoin(host, "?" + urlencode(params))

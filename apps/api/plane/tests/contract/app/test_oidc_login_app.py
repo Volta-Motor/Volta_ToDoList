@@ -210,3 +210,15 @@ class TestOIDCCallback:
         assert _error_code(response) == ["5005"]
         assert not User.objects.exists()
         assert "_auth_user_id" not in client.session
+
+    def test_unexpected_failure_is_logged_and_sent_back_to_login(self):
+        # Not a bare 500 page: the error is logged and the user lands on the login page.
+        with (
+            patch("plane.authentication.views.app.oidc.user_login", side_effect=RuntimeError("boom")),
+            patch("plane.authentication.views.app.oidc.log_exception") as log_exception,
+        ):
+            client, response = _complete_login(USERINFO)
+
+        assert response.status_code == 302
+        assert _error_code(response) == ["5126"]
+        assert isinstance(log_exception.call_args.args[0], RuntimeError)
