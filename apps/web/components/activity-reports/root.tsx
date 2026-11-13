@@ -16,6 +16,7 @@ import type { TIssue } from "@plane/types";
 import { copyTextToClipboard, generateWorkItemLink } from "@plane/utils";
 // components
 import { FilterChip } from "@/components/general-board/filter-chip";
+import { GROUP_COLORS } from "@/components/general-board/palette";
 import { getProjectTag, ProjectTag } from "@/components/general-board/project-tag";
 import { useStoryPoints } from "@/components/story-points/use-story-points";
 // hooks
@@ -164,7 +165,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
               {item.name}
             </Link>
             {getStoryPoints(item) !== undefined && (
-              <span className="text-caption-sm-medium whitespace-nowrap text-secondary">
+              <span className="rounded-full bg-accent-subtle px-2 py-0.5 text-caption-sm-semibold whitespace-nowrap text-accent-primary">
                 {t("story_points.value", { points: getStoryPoints(item) })}
               </span>
             )}
@@ -184,10 +185,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
     <div className="flex h-full w-full flex-col overflow-hidden bg-surface-1">
       <div className="flex flex-shrink-0 flex-col gap-3 border-b border-subtle px-5 py-3">
         <div className="flex flex-wrap items-center gap-3">
-          <label
-            htmlFor="activity-report-month"
-            className="text-caption-sm-medium tracking-wide text-tertiary uppercase"
-          >
+          <label htmlFor="activity-report-month" className="text-caption-md-medium text-tertiary">
             {t("activity_reports.period")}
           </label>
           <select
@@ -218,9 +216,7 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("activity_reports.project")}>
-          <span className="w-16 text-caption-sm-medium tracking-wide text-tertiary uppercase">
-            {t("activity_reports.project")}
-          </span>
+          <span className="w-14 text-caption-md-medium text-tertiary">{t("activity_reports.project")}</span>
           <FilterChip isSelected={projectFilter === ALL} onClick={() => setProjectFilter(ALL)}>
             {t("activity_reports.all")}
           </FilterChip>
@@ -249,23 +245,46 @@ export const ActivityReportsRoot = observer(function ActivityReportsRoot(props: 
           </p>
         )}
         {sections.map((section) => (
-          <section key={section.project.id} className="rounded-lg border border-subtle bg-surface-1 p-4">
+          <section
+            key={section.project.id}
+            // the left edge carries the project's color, as on the board
+            style={{ borderLeftColor: section.tag.border }}
+            className="rounded-lg border border-l-4 border-subtle bg-surface-1 p-4"
+          >
             <header className="flex items-center gap-2 pb-3">
               <ProjectTag tag={section.tag} />
-              <h2 className="text-body-md-medium text-primary">{section.project.name}</h2>
+              <h2 className="text-body-md-semibold text-primary">{section.project.name}</h2>
             </header>
             {section.completed.length > 0 && (
               <div className="pb-3">
-                <h3 className="pb-1 text-caption-md-medium text-secondary">
-                  {t("activity_reports.completed")} ({section.completed.length})
+                <h3 className="flex items-center gap-2 pb-1 text-caption-md-medium text-secondary">
+                  {t("activity_reports.completed")}
+                  <span
+                    className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-caption-sm-semibold"
+                    style={{
+                      backgroundColor: GROUP_COLORS.completed.color,
+                      color: GROUP_COLORS.completed.onColor,
+                    }}
+                  >
+                    {section.completed.length}
+                  </span>
                 </h3>
                 {renderRows(section.completed, true)}
               </div>
             )}
             {section.inProgress.length > 0 && (
               <div>
-                <h3 className="pb-1 text-caption-md-medium text-secondary">
-                  {t("activity_reports.in_progress")} ({section.inProgress.length})
+                <h3 className="flex items-center gap-2 pb-1 text-caption-md-medium text-secondary">
+                  {t("activity_reports.in_progress")}
+                  <span
+                    className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-caption-sm-semibold"
+                    style={{
+                      backgroundColor: GROUP_COLORS.started.color,
+                      color: GROUP_COLORS.started.onColor,
+                    }}
+                  >
+                    {section.inProgress.length}
+                  </span>
                 </h3>
                 {renderRows(section.inProgress, false)}
               </div>

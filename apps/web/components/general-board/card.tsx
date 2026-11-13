@@ -79,9 +79,13 @@ export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props)
         onDragStart(item);
       }}
       onDragEnd={onDragEnd}
+      // the left edge carries the project's color, so a column reads by project at a glance
+      style={{ borderLeftColor: projectTag.border }}
       className={cn(
-        "flex flex-col gap-2.5 rounded-md border border-subtle bg-surface-1 p-3 shadow-raised-100",
-        isEditable && "cursor-grab",
+        "flex flex-col gap-2.5 rounded-md border border-l-4 border-subtle bg-surface-1 p-3 shadow-raised-100",
+        "transition-[box-shadow,transform] duration-150 hover:-translate-y-px hover:shadow-raised-200",
+        "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        isEditable && "cursor-grab active:cursor-grabbing",
         isDragging && "opacity-50"
       )}
     >
@@ -110,7 +114,7 @@ export const GeneralBoardCard = observer(function GeneralBoardCard(props: Props)
           {storyPoints !== undefined && (
             <span
               title={t("story_points.label")}
-              className="rounded-sm bg-layer-2 px-1.5 py-0.5 text-caption-sm-medium whitespace-nowrap text-primary"
+              className="rounded-full bg-accent-subtle px-2 py-0.5 text-caption-sm-semibold whitespace-nowrap text-accent-primary"
             >
               {t("story_points.value", { points: storyPoints })}
             </span>

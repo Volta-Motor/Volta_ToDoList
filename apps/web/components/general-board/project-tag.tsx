@@ -11,14 +11,20 @@ export type TProjectTag = {
   border: string;
 };
 
-/** Tag colors cycle through this list in project order, so each project keeps one color across the board. */
+/**
+ * Tag colors cycle through this list in project order, so each project keeps one color across the
+ * board. Eight clearly different hues, each dark enough for white text.
+ */
 const PROJECT_TAG_COLORS: Omit<TProjectTag, "identifier">[] = [
-  { background: "#14212D", text: "#FFFFFF", border: "#14212D" },
-  { background: "#DCEDB0", text: "#14212D", border: "#7BA317" },
-  { background: "#E6EBEF", text: "#14212D", border: "#6A8296" },
-  { background: "#2C4457", text: "#FFFFFF", border: "#2C4457" },
-  { background: "#E2DED0", text: "#14212D", border: "#6A8296" },
-  { background: "#C3E07B", text: "#14212D", border: "#5F7E12" },
+  // the navy tag keeps a lighter outline so it does not vanish on the dark theme
+  { background: "#14212D", text: "#FFFFFF", border: "#405C72" },
+  { background: "#557211", text: "#FFFFFF", border: "#557211" },
+  { background: "#1F6FA8", text: "#FFFFFF", border: "#1F6FA8" },
+  { background: "#B5432F", text: "#FFFFFF", border: "#B5432F" },
+  { background: "#6548B8", text: "#FFFFFF", border: "#6548B8" },
+  { background: "#0E7C73", text: "#FFFFFF", border: "#0E7C73" },
+  { background: "#94610A", text: "#FFFFFF", border: "#94610A" },
+  { background: "#A63A78", text: "#FFFFFF", border: "#A63A78" },
 ];
 
 export const getProjectTag = (identifier: string, index: number): TProjectTag => ({

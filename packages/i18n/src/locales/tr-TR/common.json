@@ -58,6 +58,10 @@
     "all": "Tümü",
     "unassigned": "Atanmamış",
     "assignee_count": "{count} kişi",
+    "flow": {
+      "items": "{count} iş",
+      "done": "%{percent} tamamlandı"
+    },
     "empty_column": "Bu filtrede iş yok",
     "loading": "Yükleniyor",
     "load_failed": "Board yüklenemedi. Yeniden denemek için sayfayı yenileyin.",
