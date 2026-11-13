@@ -26,9 +26,9 @@ docker compose ps                  # migrator "exited (0)", diğerleri "running"
 docker compose logs -f migrator    # veritabanı kurulumunu izlemek için
 ```
 
-Sonra tarayıcıda `http://localhost/god-mode` adresini açıp ilk yönetici hesabını oluşturun, ardından `http://localhost` adresinden uygulamaya girin.
+Sonra tarayıcıda `http://localhost:9300/god-mode` adresini açıp ilk yönetici hesabını oluşturun, ardından `http://localhost:9300` adresinden uygulamaya girin.
 
-80 numaralı port doluysa (Windows'ta IIS, başka bir web sunucusu vb.) adresi portuyla verin:
+Uygulama varsayılan olarak **9300** portunda çalışır. Port doluysa ya da başka bir port isterseniz adresi portuyla verin:
 
 ```bash
 ./hazirla.sh http://localhost:8080
@@ -38,38 +38,58 @@ Denemeyi kapatmak için `docker compose down`, verileri de silmek için `docker 
 
 ## Sunucuya kurulum
 
-1. Depoyu sunucuya alın ve ayarları hazırlayın. Adres, kullanıcıların tarayıcıya yazacağı adrestir:
+1. Depoyu sunucuya alın ve ayarları hazırlayın. Adres, kullanıcıların tarayıcıya yazacağı adrestir; sunucunun adı ya da IP'si ve port:
 
    ```bash
    git clone https://github.com/Volta-Motor/Volta_ToDoList.git
    cd Volta_ToDoList/deployments/volta
-   ./hazirla.sh https://todo.sirketiniz.com
+   ./hazirla.sh http://sunucu-adresi:9300
    ```
 
-2. HTTPS'i ayarlayın (aşağıdaki bölüm), sonra başlatın:
+   Sunucunun güvenlik duvarında 9300 portunu şirket ağına açın. Uygulamayı bir alan adıyla ve HTTPS ile yayınlayacaksanız aşağıdaki HTTPS bölümüne bakın.
+
+2. Başlatın:
 
    ```bash
    docker compose up -d --build
    ```
 
-3. `https://todo.sirketiniz.com/god-mode` adresinde ilk yönetici hesabını oluşturun.
+3. `http://sunucu-adresi:9300/god-mode` adresinde ilk yönetici hesabını oluşturun.
 
-4. Aynı panelde **Authentication → OpenID Connect** bölümünden Zitadel bilgilerini girip girişi etkinleştirin. Zitadel'deki yönlendirme adresi `https://todo.sirketiniz.com/auth/oidc/callback/` olmalıdır. Ayrıntılar: [zitadel-giris.md](zitadel-giris.md). İstemci bilgilerini depoya ya da `.env` dosyasına yazmanız gerekmez.
+4. Aynı panelde **Authentication → OpenID Connect** bölümünden Zitadel bilgilerini girip girişi etkinleştirin. Zitadel'deki yönlendirme adresi, uygulama adresinin sonuna `/auth/oidc/callback/` eklenmiş hâlidir: `http://sunucu-adresi:9300/auth/oidc/callback/`. Adres `https` değilse Zitadel uygulamasında "Development Mode" açık olmalıdır. Ayrıntılar: [zitadel-giris.md](zitadel-giris.md). İstemci bilgilerini depoya ya da `.env` dosyasına yazmanız gerekmez.
 
 5. Uygulamaya girin, çalışma alanını açın, projeleri tanımlayın ve ekip üyelerini davet edin.
 
-`.env` dosyasını saklayın ve depoya göndermeyin. İçindeki parolalar veritabanıyla eşleşir; dosya kaybolur ya da yeniden üretilirse kurulu sistem veritabanına bağlanamaz. `hazirla.sh` bu yüzden var olan `.env` dosyasına dokunmaz.
+`.env` dosyasını saklayın ve depoya göndermeyin. İçindeki parolalar veritabanıyla eşleşir; dosya kaybolur ya da yeniden üretilirse kurulu sistem veritabanına bağlanamaz. `hazirla.sh` bu yüzden var olan `.env` dosyasındaki parolalara ve anahtarlara dokunmaz.
+
+### Adresi ya da portu sonradan değiştirme
+
+`.env` varken betiğe yeni adresi verin; yalnızca adres ve port satırları güncellenir:
+
+```bash
+./hazirla.sh http://sunucu-adresi:9300
+docker compose up -d
+```
+
+Adres değişince Zitadel'deki yönlendirme adresini de güncelleyin.
 
 ## HTTPS
 
-İki yol var; ikisi de `deployments/volta/.env` içinde ayarlanır:
+İki yol var:
 
-- **Şirketin kendi ters vekili (nginx, Traefik vb.) varsa:** Sertifikayı o sonlandırır. `LISTEN_HTTP_PORT` değerini boş bir porta (örneğin `8085`) alın ve vekilinizi bu porta yönlendirin. WebSocket yükseltmesine (`/live`) izin verin. Önde bir vekil daha olduğu için `NUM_PROXIES=2` verin.
-- **Yoksa:** Kurulumdaki `proxy` servisi (Caddy) sertifikayı kendisi alabilir. `SITE_ADDRESS=todo.sirketiniz.com` ve `CERT_EMAIL="email <adres>"` değerlerini verin; 80 ve 443 portları internetten erişilebilir olmalıdır.
+- **Şirketin kendi ters vekili (nginx, Traefik vb.) varsa:** Sertifikayı o sonlandırır. `./hazirla.sh https://todo.sirketiniz.com` çalıştırın; uygulama yine 9300 portunda dinler, vekilinizi bu porta yönlendirin. WebSocket yükseltmesine (`/live`) izin verin. Önde bir vekil daha olduğu için `.env` içinde `NUM_PROXIES=2` verin.
+- **Yoksa:** Kurulumdaki `proxy` servisi (Caddy) sertifikayı kendisi alabilir. `.env` içinde `SITE_ADDRESS=todo.sirketiniz.com`, `CERT_EMAIL="email <adres>"`, `LISTEN_HTTP_PORT=80` verin ve kurulumu 443 portunu da açan ek dosyayla başlatın: `docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build`. 80 ve 443 portları internetten erişilebilir olmalıdır.
 
-## Mevcut Plane kurulumuyla aynı sunucuda çalıştırma
+## Sunucudaki diğer uygulamalara etkisi
 
-Kurulum `todolist` proje adıyla çalışır; konteyner ve veri birimi adları Plane'inkilerle karışmaz. Çakışan tek şey portlardır: `.env` içinde `LISTEN_HTTP_PORT` ve `LISTEN_HTTPS_PORT` değerlerini Plane'in kullanmadığı portlara alın.
+Kurulum kendi içinde kapalıdır; sunucudaki başka uygulamalara, Plane dahil, dokunmaz:
+
+- **Port:** Dışarıya yalnızca **9300** portu açılır. Veritabanı, önbellek, kuyruk ve dosya deposu hiçbir port açmaz; yalnızca kurulumun kendi iç ağından erişilir. Başka bir uygulamanın 5432, 6379, 80, 443 gibi portlarıyla çakışmaz.
+- **Adlar:** Bütün konteynerler, veri birimleri ve ağ `todolist` önekiyle oluşur (`todolist-api-1`, `todolist_pgdata`, `todolist_default`). Sabit konteyner adı yoktur.
+- **Dosyalar:** Sunucudaki hiçbir klasör konteynerlere bağlanmaz; veriler Docker'ın `todolist_` önekli birimlerinde durur.
+- **Komutlar:** `deployments/volta` klasöründe çalıştırılan `docker compose` komutları (`up`, `down`, `down -v`, `logs`) yalnızca bu kurulumu etkiler.
+
+Dikkat edilecek iki şey: 9300 portu başka bir uygulamada kullanılıyorsa kurulum başlamaz, başka uygulamayı da bozmaz; o durumda `./hazirla.sh http://sunucu-adresi:BAŞKA_PORT` ile port değiştirin. Bir de `docker system prune`, `docker volume prune` gibi **genel** temizlik komutları bu kuruluma özel değildir ve sunucudaki bütün Docker verilerini etkiler; bu belgedeki adımlar bunları kullanmaz.
 
 ## Servisler
 
@@ -120,7 +140,7 @@ docker run --rm -v todolist_uploads:/data -v "$PWD":/yedek alpine \
 | Belirti                                                                 | Bakılacak yer                                                                            |
 | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Derleme yarıda kesiliyor                                                | Docker'a ayrılan bellek (Docker Desktop → Settings → Resources); en az 6–8 GB verin      |
-| "port is already allocated"                                             | Port dolu; `.env` içinde `LISTEN_HTTP_PORT`/`LISTEN_HTTPS_PORT` ve `WEB_URL` değerleri   |
+| "port is already allocated"                                             | Port başka bir uygulamada; `./hazirla.sh http://adres:BAŞKA_PORT` ile değiştirin         |
 | Arayüzde metin yerine anahtarlar görünüyor (`general_board.title` gibi) | Eski bir derleme; `git pull` sonrası `docker compose up -d --build` ile yeniden derleyin |
 | Sayfa açılıyor, giriş yapılamıyor                                       | `.env` içindeki `WEB_URL` ve `CORS_ALLOWED_ORIGINS` tarayıcıdaki adresle birebir aynı mı |
 | Zitadel'den dönüşte hata                                                | Yönlendirme adresi ve Issuer URL; kullanıcının e-postası Zitadel'de doğrulanmış mı       |

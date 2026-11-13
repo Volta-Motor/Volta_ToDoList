@@ -6,7 +6,7 @@ TO DO List, Zitadel gibi OpenID Connect sağlayıcılarıyla giriş yapabilir. A
 
 1. Bir proje açın (ya da var olanı kullanın) ve içine **Web** tipinde bir uygulama ekleyin.
 2. Kimlik doğrulama yöntemi olarak **PKCE** seçin. Gizli anahtar kullanmak isterseniz **Basic** seçin; uygulama gizli anahtarı HTTP Basic ile gönderir, **Post** yöntemi desteklenmez.
-3. Yönlendirme adresi (Redirect URI): `https://<uygulama-adresi>/auth/oidc/callback/`
+3. Yönlendirme adresi (Redirect URI): uygulama adresi + `/auth/oidc/callback/`. Örnek: `https://todo.sirketiniz.com/auth/oidc/callback/` ya da `http://sunucu-adresi:9300/auth/oidc/callback/`. Adres `https` değilse uygulamada **Development Mode**'u açın; Zitadel `http` adresini ancak böyle kabul eder.
 4. İstemci kimliğini (Client ID) not edin.
 
 Kullanıcıların e-posta adresi Zitadel'de **doğrulanmış** olmalıdır. Doğrulanmamış e-postayla giriş reddedilir, çünkü hesaplar e-posta üzerinden eşleştirilir.

@@ -33,4 +33,6 @@ cd deployments/volta
 docker compose up -d --build
 ```
 
+Uygulama `http://localhost:9300` adresinde açılır.
+
 Yerelde deneme, sunucuya kurulum, güncelleme ve yedekleme adımları `docs/devreye-alma.md` belgesindedir.
