@@ -78,11 +78,18 @@ Adres değişince Zitadel'deki yönlendirme adresini de güncelleyin.
 İki yol var:
 
 - **Şirketin kendi ters vekili (nginx, Traefik vb.) varsa:** Sertifikayı o sonlandırır. `./hazirla.sh https://todo.sirketiniz.com` çalıştırın; uygulama yine 9300 portunda dinler, vekilinizi bu porta yönlendirin. WebSocket yükseltmesine (`/live`) izin verin. Önde bir vekil daha olduğu için `.env` içinde `NUM_PROXIES=2` verin.
-- **Yoksa:** Kurulumdaki `proxy` servisi (Caddy) sertifikayı kendisi alabilir. `.env` içinde `SITE_ADDRESS=todo.sirketiniz.com`, `CERT_EMAIL="email <adres>"`, `LISTEN_HTTP_PORT=80` ve `LISTEN_HTTPS_PORT=443` verin; 80 ve 443 portları internetten erişilebilir olmalıdır.
+- **Yoksa:** Kurulumdaki `proxy` servisi (Caddy) sertifikayı kendisi alabilir. `.env` içinde `SITE_ADDRESS=todo.sirketiniz.com`, `CERT_EMAIL="email <adres>"`, `LISTEN_HTTP_PORT=80` verin ve kurulumu 443 portunu da açan ek dosyayla başlatın: `docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build`. 80 ve 443 portları internetten erişilebilir olmalıdır.
 
-## Mevcut Plane kurulumuyla aynı sunucuda çalıştırma
+## Sunucudaki diğer uygulamalara etkisi
 
-Kurulum `todolist` proje adıyla çalışır; konteyner ve veri birimi adları Plane'inkilerle karışmaz. Portlar da varsayılan olarak 9300 ve 9343 olduğu için Plane'in 80/443 portlarıyla çakışmaz.
+Kurulum kendi içinde kapalıdır; sunucudaki başka uygulamalara, Plane dahil, dokunmaz:
+
+- **Port:** Dışarıya yalnızca **9300** portu açılır. Veritabanı, önbellek, kuyruk ve dosya deposu hiçbir port açmaz; yalnızca kurulumun kendi iç ağından erişilir. Başka bir uygulamanın 5432, 6379, 80, 443 gibi portlarıyla çakışmaz.
+- **Adlar:** Bütün konteynerler, veri birimleri ve ağ `todolist` önekiyle oluşur (`todolist-api-1`, `todolist_pgdata`, `todolist_default`). Sabit konteyner adı yoktur.
+- **Dosyalar:** Sunucudaki hiçbir klasör konteynerlere bağlanmaz; veriler Docker'ın `todolist_` önekli birimlerinde durur.
+- **Komutlar:** `deployments/volta` klasöründe çalıştırılan `docker compose` komutları (`up`, `down`, `down -v`, `logs`) yalnızca bu kurulumu etkiler.
+
+Dikkat edilecek iki şey: 9300 portu başka bir uygulamada kullanılıyorsa kurulum başlamaz, başka uygulamayı da bozmaz; o durumda `./hazirla.sh http://sunucu-adresi:BAŞKA_PORT` ile port değiştirin. Bir de `docker system prune`, `docker volume prune` gibi **genel** temizlik komutları bu kuruluma özel değildir ve sunucudaki bütün Docker verilerini etkiler; bu belgedeki adımlar bunları kullanmaz.
 
 ## Servisler
 
@@ -133,7 +140,7 @@ docker run --rm -v todolist_uploads:/data -v "$PWD":/yedek alpine \
 | Belirti                                                                 | Bakılacak yer                                                                            |
 | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Derleme yarıda kesiliyor                                                | Docker'a ayrılan bellek (Docker Desktop → Settings → Resources); en az 6–8 GB verin      |
-| "port is already allocated"                                             | Port dolu; `.env` içinde `LISTEN_HTTP_PORT`/`LISTEN_HTTPS_PORT` ve `WEB_URL` değerleri   |
+| "port is already allocated"                                             | Port başka bir uygulamada; `./hazirla.sh http://adres:BAŞKA_PORT` ile değiştirin         |
 | Arayüzde metin yerine anahtarlar görünüyor (`general_board.title` gibi) | Eski bir derleme; `git pull` sonrası `docker compose up -d --build` ile yeniden derleyin |
 | Sayfa açılıyor, giriş yapılamıyor                                       | `.env` içindeki `WEB_URL` ve `CORS_ALLOWED_ORIGINS` tarayıcıdaki adresle birebir aynı mı |
 | Zitadel'den dönüşte hata                                                | Yönlendirme adresi ve Issuer URL; kullanıcının e-postası Zitadel'de doğrulanmış mı       |

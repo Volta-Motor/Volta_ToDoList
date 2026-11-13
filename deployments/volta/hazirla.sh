@@ -53,10 +53,6 @@ case "$listen_port" in
     exit 1
     ;;
 esac
-# Kurulumdaki vekilin 443 portu da bilgisayara açılır; 80/443 çifti dışında
-# çakışmasın diye HTTP portunun 43 fazlasına alınır (9300 -> 9343).
-if [ "$listen_port" = "80" ]; then https_port=443; else https_port="$((listen_port + 43))"; fi
-
 random() {
   # $1 uzunluğunda harf ve rakamdan oluşan rastgele değer (URL içinde güvenle kullanılır).
   LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c "$1" || true
@@ -75,7 +71,6 @@ set_address() {
   set_value WEB_URL "$address"
   set_value CORS_ALLOWED_ORIGINS "$address"
   set_value LISTEN_HTTP_PORT "$listen_port"
-  set_value LISTEN_HTTPS_PORT "$https_port"
 }
 
 if [ -f .env ]; then

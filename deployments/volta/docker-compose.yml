@@ -45,7 +45,6 @@ x-proxy-env: &proxy-env
   CERT_ACME_CA: ${CERT_ACME_CA}
   CERT_ACME_DNS: ${CERT_ACME_DNS}
   LISTEN_HTTP_PORT: ${LISTEN_HTTP_PORT:-9300}
-  LISTEN_HTTPS_PORT: ${LISTEN_HTTPS_PORT:-9343}
   BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-uploads}
   SITE_ADDRESS: ${SITE_ADDRESS:-:80}
   TRUSTED_PROXIES: ${TRUSTED_PROXIES:-0.0.0.0/0}
@@ -262,8 +261,9 @@ services:
     environment:
       <<: *proxy-env
     ports:
+      # Bilgisayara/sunucuya açılan tek port budur. Diğer servisler yalnızca
+      # kurulumun kendi iç ağından (todolist_default) erişilebilir.
       - ${LISTEN_HTTP_PORT:-9300}:80
-      - ${LISTEN_HTTPS_PORT:-9343}:443
     volumes:
       - proxy_config:/config
       - proxy_data:/data
