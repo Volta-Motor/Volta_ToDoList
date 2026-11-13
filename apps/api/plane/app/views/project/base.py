@@ -41,6 +41,7 @@ from plane.db.models import (
     WorkspaceMember,
 )
 from plane.db.models.intake import IntakeIssueStatus
+from plane.todolist.membership import join_workspace_projects
 from plane.utils.host import base_host
 from plane.utils.order_queryset import PROJECT_ORDER_BY_ALLOWLIST, sanitize_order_by
 
@@ -101,6 +102,8 @@ class ProjectViewSet(BaseViewSet):
 
     @allow_permission(allowed_roles=[ROLE.ADMIN, ROLE.MEMBER, ROLE.GUEST], level="WORKSPACE")
     def list_detail(self, request, slug):
+        # Workspace admins and members are members of every project (see plane.todolist.membership)
+        join_workspace_projects(request.user, slug)
         fields = [field for field in request.GET.get("fields", "").split(",") if field]
         projects = self.get_queryset().order_by("sort_order", "name")
         if WorkspaceMember.objects.filter(
@@ -145,6 +148,8 @@ class ProjectViewSet(BaseViewSet):
 
     @allow_permission(allowed_roles=[ROLE.ADMIN, ROLE.MEMBER, ROLE.GUEST], level="WORKSPACE")
     def list(self, request, slug):
+        # Workspace admins and members are members of every project (see plane.todolist.membership)
+        join_workspace_projects(request.user, slug)
         sort_order = ProjectUserProperty.objects.filter(
             user=self.request.user,
             project_id=OuterRef("pk"),

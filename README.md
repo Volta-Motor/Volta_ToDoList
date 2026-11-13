@@ -20,6 +20,7 @@ Kod GNU AGPL-3.0 lisansı altındadır; bkz. `LICENSE.txt` ve `COPYRIGHT.txt`. P
 4. İş türleri (Görev, Hata, Kullanıcı hikâyesi, Özellik); iş öğelerinde kabul kriterleri ve test kriterleri listeleri
 5. Story point: her projede Fibonacci (1, 2, 3, 5, 8, 13, 21) puan sistemi kendiliğinden tanımlı; kartta, sütun toplamında ve raporda görünür
 6. Faaliyet raporları ekranı: seçilen ayda tamamlanan ve devam eden işler, proje bazında
+7. Otomatik proje üyeliği: çalışma alanının yönetici ve üyeleri bütün projelerin üyesidir; kişiyi yalnızca çalışma alanına davet etmek yeterlidir
 
 Plane'de bulunmayan arka uç eklemeleri `apps/api/plane/todolist` uygulamasında durur; kendi migration'ları vardır ve Plane'in migration zinciriyle çakışmaz.
 
