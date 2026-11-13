@@ -4,7 +4,7 @@
 
 """Contract tests for starting an OpenID Connect login and exposing it in the instance config."""
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from plane.authentication.provider.oauth.oidc import OIDCOAuthProvider
+from plane.db.models import Account, Profile, User
 from plane.license.models import Instance, InstanceConfiguration
 
 ISSUER = "https://login.example.com"
@@ -103,3 +104,121 @@ class TestInstanceConfigExposesOIDC:
 
         assert response.json()["config"]["is_oidc_enabled"] is True
         assert response.json()["config"]["oidc_provider_name"] == "Zitadel"
+
+
+# What a Zitadel userinfo response looks like for a user without a profile picture.
+USERINFO = {
+    "sub": "289123456789",
+    "name": "Ada Lovelace",
+    "given_name": "Ada",
+    "family_name": "Lovelace",
+    "locale": "tr",
+    "preferred_username": "ada@volta.example.com",
+    "email": "Ada.Lovelace@example.com",
+    "email_verified": True,
+}
+TOKEN = {"access_token": "access-token", "token_type": "Bearer", "expires_in": 43199, "id_token": "id-token"}
+
+
+def _json_response(payload):
+    response = MagicMock()
+    response.json.return_value = payload
+    response.raise_for_status.return_value = None
+    return response
+
+
+def _complete_login(userinfo):
+    """Start a login and come back from the provider with the given userinfo."""
+    client = Client(HTTP_USER_AGENT="Mozilla/5.0 (contract test)")
+    with patch.object(OIDCOAuthProvider, "discover", return_value=ENDPOINTS):
+        start = client.get(reverse("oidc-initiate"))
+        state = parse_qs(urlparse(start.url).query)["state"][0]
+        with (
+            patch("plane.authentication.adapter.oauth.requests.post", return_value=_json_response(TOKEN)),
+            patch("plane.authentication.adapter.oauth.requests.get", return_value=_json_response(userinfo)),
+        ):
+            response = client.get(reverse("oidc-callback"), {"code": "authorization-code", "state": state})
+    return client, response
+
+
+def _error_code(response):
+    return parse_qs(urlparse(response.url).query).get("error_code")
+
+
+@pytest.mark.contract
+@pytest.mark.django_db
+class TestOIDCCallback:
+    """The whole way back from the provider: token exchange, userinfo, account, session."""
+
+    @pytest.fixture(autouse=True)
+    def _configured(self, instance):
+        _configure(OIDC_ISSUER_URL=ISSUER, OIDC_CLIENT_ID="client-id")
+
+    def test_first_login_creates_the_user_and_signs_in(self):
+        client, response = _complete_login(USERINFO)
+
+        assert response.status_code == 302
+        assert _error_code(response) is None
+        user = User.objects.get(email="ada.lovelace@example.com")
+        assert (user.first_name, user.last_name) == ("Ada", "Lovelace")
+        assert user.is_email_verified is True
+        assert user.avatar == ""
+        assert user.last_login_medium == "oidc"
+        assert Account.objects.filter(user=user, provider="oidc", provider_account_id="289123456789").exists()
+        assert client.session["_auth_user_id"] == str(user.id)
+
+    def test_existing_user_is_matched_by_email(self):
+        existing = User.objects.create(email="ada.lovelace@example.com", username="ada")
+        Profile.objects.create(user=existing)
+
+        client, response = _complete_login(USERINFO)
+
+        assert _error_code(response) is None
+        assert User.objects.filter(email="ada.lovelace@example.com").count() == 1
+        assert client.session["_auth_user_id"] == str(existing.id)
+
+    def test_profile_sync_without_a_picture(self):
+        # Zitadel sends no `picture` for a user without one. With sync on this used to write NULL
+        # into the avatar column of an existing user and answer 500.
+        _configure(ENABLE_OIDC_SYNC="1")
+        existing = User.objects.create(email="ada.lovelace@example.com", username="ada", first_name="Old")
+        Profile.objects.create(user=existing)
+
+        client, response = _complete_login(USERINFO)
+
+        assert response.status_code == 302
+        assert _error_code(response) is None
+        existing.refresh_from_db()
+        assert existing.first_name == "Ada"
+        assert existing.avatar == ""
+        assert client.session["_auth_user_id"] == str(existing.id)
+
+    def test_unverified_email_is_refused(self):
+        client, response = _complete_login({**USERINFO, "email_verified": False})
+
+        assert _error_code(response) is not None
+        assert not User.objects.exists()
+        assert "_auth_user_id" not in client.session
+
+    @pytest.mark.parametrize(
+        "email", ["zitadel-admin@zitadel.192.168.1.240", "ada@intranet", "ada lovelace@example.com"]
+    )
+    def test_address_that_is_not_an_email_is_refused(self, email):
+        # e.g. the built-in admin of a Zitadel installed under an IP address
+        client, response = _complete_login({**USERINFO, "email": email})
+
+        assert _error_code(response) == ["5005"]
+        assert not User.objects.exists()
+        assert "_auth_user_id" not in client.session
+
+    def test_unexpected_failure_is_logged_and_sent_back_to_login(self):
+        # Not a bare 500 page: the error is logged and the user lands on the login page.
+        with (
+            patch("plane.authentication.views.app.oidc.user_login", side_effect=RuntimeError("boom")),
+            patch("plane.authentication.views.app.oidc.log_exception") as log_exception,
+        ):
+            client, response = _complete_login(USERINFO)
+
+        assert response.status_code == 302
+        assert _error_code(response) == ["5126"]
+        assert isinstance(log_exception.call_args.args[0], RuntimeError)

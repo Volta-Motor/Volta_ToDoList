@@ -229,7 +229,9 @@ class OIDCOAuthProvider(OauthAdapter):
                 "user": {
                     "provider_id": str(subject),
                     "email": email,
-                    "avatar": user_info_response.get("picture"),
+                    # `picture` is optional. The user's avatar column does not take NULL, and the
+                    # profile sync writes this value to it as is, so "no picture" is an empty string.
+                    "avatar": user_info_response.get("picture") or "",
                     "first_name": first_name,
                     "last_name": user_info_response.get("family_name") or "",
                     "is_password_autoset": True,
