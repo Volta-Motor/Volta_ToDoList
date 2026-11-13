@@ -80,6 +80,13 @@ Adres değişince Zitadel'deki yönlendirme adresini de güncelleyin.
 - **Şirketin kendi ters vekili (nginx, Traefik vb.) varsa:** Sertifikayı o sonlandırır. `./hazirla.sh https://todo.sirketiniz.com` çalıştırın; uygulama yine 9300 portunda dinler, vekilinizi bu porta yönlendirin. WebSocket yükseltmesine (`/live`) izin verin. Önde bir vekil daha olduğu için `.env` içinde `NUM_PROXIES=2` verin.
 - **Yoksa:** Kurulumdaki `proxy` servisi (Caddy) sertifikayı kendisi alabilir. `.env` içinde `SITE_ADDRESS=todo.sirketiniz.com`, `CERT_EMAIL="email <adres>"`, `LISTEN_HTTP_PORT=80` verin ve kurulumu 443 portunu da açan ek dosyayla başlatın: `docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build`. 80 ve 443 portları internetten erişilebilir olmalıdır.
 
+## Kullanıcılar ve üyelik
+
+- Bir kişinin işleri görebilmesi için **çalışma alanına davet edilmesi** yeterlidir (çalışma alanı adı → Ayarlar → Üyeler → Üye ekle). Yönetici ve Üye rolündekiler bütün projelere kendiliğinden eklenir; yeni açılan projeler de bir sonraki sayfa açılışında herkese görünür.
+- **Misafir** rolü kısıtlıdır: yalnızca elle eklendiği projeleri görür.
+- Bir projeden elle çıkarılan kişi o projeye yeniden eklenmez.
+- Bu davranışı kapatmak için `.env` dosyasına `TODOLIST_AUTO_PROJECT_MEMBERSHIP=0` yazıp `docker compose up -d` çalıştırın; o zaman her projeye üyeler elle eklenir.
+
 ## Sunucudaki diğer uygulamalara etkisi
 
 Kurulum kendi içinde kapalıdır; sunucudaki başka uygulamalara, Plane dahil, dokunmaz:
