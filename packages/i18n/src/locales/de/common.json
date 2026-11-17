@@ -1,4 +1,16 @@
 {
+  "member_password_reset": {
+    "action": "Reset password",
+    "confirm_title": "Reset the password of {name}?",
+    "confirm_description": "A temporary password is created. Their current password stops working and they are signed out everywhere.",
+    "resetting": "Resetting",
+    "done_title": "Temporary password",
+    "done_description": "This password is shown only now. Pass it to {name} over a safe channel and ask them to change it after signing in.",
+    "copy": "Copy password",
+    "copied": "Password copied",
+    "close": "Close",
+    "failed": "The password could not be reset"
+  },
   "test_criteria": {
     "title": "Test criteria",
     "progress": "{done}/{total} passed",

@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 // plane imports
 import { ROLE, EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
-import { DeactivatedUserOutline, DeleteOutline, MoreHorizontalOutline } from "@makeplane/propel/icons";
+import { DeactivatedUserOutline, DeleteOutline, KeyOutline, MoreHorizontalOutline } from "@makeplane/propel/icons";
 import { Avatar } from "@makeplane/propel/components/avatar";
 import { Badge } from "@makeplane/propel/components/badge";
 import { Icon } from "@makeplane/propel/components/icon";
@@ -38,6 +38,7 @@ type NameProps = {
   isAdmin: boolean;
   currentUser: IUser | undefined;
   setRemoveMemberModal: (rowData: RowData) => void;
+  setResetPasswordModal: (rowData: RowData) => void;
 };
 
 type TRoleOption = { key: EUserPermissions; label: string };
@@ -53,7 +54,7 @@ type AccountTypeProps = {
 };
 
 export function NameColumn(props: NameProps) {
-  const { rowData, workspaceSlug, isAdmin, currentUser, setRemoveMemberModal } = props;
+  const { rowData, workspaceSlug, isAdmin, currentUser, setRemoveMemberModal, setResetPasswordModal } = props;
   // plane hooks
   const { t } = useTranslation();
   // derived values
@@ -92,6 +93,13 @@ export function NameColumn(props: NameProps) {
                 }
               />
               <MenuContent side="bottom" align="end">
+                {isAdmin && id !== currentUser?.id && (
+                  <MenuItem
+                    icon={<Icon icon={KeyOutline} />}
+                    label={t("member_password_reset.action")}
+                    onClick={() => setResetPasswordModal(rowData)}
+                  />
+                )}
                 <MenuItem
                   icon={<Icon icon={DeleteOutline} />}
                   label={id === currentUser?.id ? t("leave") : t("remove")}
