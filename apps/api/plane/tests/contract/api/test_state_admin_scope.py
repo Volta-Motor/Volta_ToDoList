@@ -71,7 +71,8 @@ class TestStateV1AdminScope:
 
         state.refresh_from_db()
         assert (state.name, state.default) == ("Backlog", False)
-        assert State.objects.filter(project=project).count() == 1
+        # The fixture state plus the 'Danışmanda' state every project gets.
+        assert State.objects.filter(project=project).count() == 2
 
     def test_admin_patch_default_keeps_one_default(self, api_key_client, workspace, project, default_state, state):
         response = api_key_client.patch(

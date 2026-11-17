@@ -188,6 +188,9 @@ class TestDraftUpdateProjectMembership:
         ProjectMember.objects.create(project=second, member=member, workspace=workspace, role=15)
         second_state = State.objects.create(name="Todo", project=second, workspace=workspace, group="backlog")
         draft = _draft(workspace, projects["own"], member)
+        # A draft falls back to a state of its own project (every project has
+        # the 'Danışmanda' state), so check that the rejected update left it alone.
+        original_state_id = draft.state_id
 
         response = member_client.patch(
             draft_url(workspace.slug, draft.id),
@@ -199,7 +202,8 @@ class TestDraftUpdateProjectMembership:
             f"Got {response.status_code}: {getattr(response, 'data', None)!r}"
         )
         draft.refresh_from_db()
-        assert draft.state_id is None
+        assert draft.state_id == original_state_id
+        assert draft.state_id != second_state.id
 
     @pytest.mark.django_db
     def test_can_update_draft_in_own_project(self, member_client, workspace, member, projects):
