@@ -193,12 +193,6 @@ oidc_config_variables = [
         "category": "OIDC",
         "is_encrypted": True,
     },
-    {
-        "key": "ENABLE_OIDC_SYNC",
-        "value": os.environ.get("ENABLE_OIDC_SYNC", "0"),
-        "category": "OIDC",
-        "is_encrypted": False,
-    },
 ]
 
 smtp_config_variables = [

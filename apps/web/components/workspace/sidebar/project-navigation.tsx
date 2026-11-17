@@ -11,6 +11,7 @@ import { useParams, usePathname } from "next/navigation";
 import { EUserPermissionsLevel, EUserPermissions } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import {
+  BoardOutline,
   CyclesOutline,
   IntakeOutline,
   ModuleOutline,
@@ -78,6 +79,17 @@ export const ProjectNavigation = observer(function ProjectNavigation(props: TPro
 
   const baseNavigation = useCallback(
     (workspaceSlug: string, projectId: string): TNavigationItem[] => [
+      {
+        // the project's own board, in the same layout as the general board
+        i18n_key: "general_board.project_board",
+        key: "board",
+        name: "Board",
+        href: `/${workspaceSlug}/board/${projectId}`,
+        icon: BoardOutline,
+        access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
+        shouldRender: true,
+        sortOrder: 0,
+      },
       {
         i18n_key: "sidebar.work_items",
         key: "work_items",

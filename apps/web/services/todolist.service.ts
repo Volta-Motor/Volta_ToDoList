@@ -85,4 +85,10 @@ export class TodoListService extends APIService {
   ): Promise<void> {
     await this.delete(`${this.criteriaUrl(workspaceSlug, projectId, issueId)}${criterionId}/`);
   }
+
+  /** A workspace admin gives a member a temporary password; the server makes it up and returns it once. */
+  async resetMemberPassword(workspaceSlug: string, userId: string): Promise<{ password: string }> {
+    const response = await this.post(`/api/workspaces/${workspaceSlug}/users/${userId}/reset-password/`);
+    return response?.data;
+  }
 }

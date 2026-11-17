@@ -24,14 +24,14 @@ Yönetim panelinde (`/god-mode`) **Authentication → OpenID Connect → Configu
 
 Kaydettikten sonra sayfanın üstündeki anahtarla girişi etkinleştirin. Giriş ekranında "Continue with Zitadel" düğmesi görünür.
 
-Aynı ayarlar API servisine ortam değişkeni olarak da verilebilir: `IS_OIDC_ENABLED`, `OIDC_PROVIDER_NAME`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `ENABLE_OIDC_SYNC`. Ortam değişkenleri yalnızca ilk kurulumda okunur; sonrasında yönetim panelindeki değer geçerlidir. Gizli anahtarı depoya yazmayın.
+Aynı ayarlar API servisine ortam değişkeni olarak da verilebilir: `IS_OIDC_ENABLED`, `OIDC_PROVIDER_NAME`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`. Ortam değişkenleri yalnızca ilk kurulumda okunur; sonrasında yönetim panelindeki değer geçerlidir. Gizli anahtarı depoya yazmayın.
 
 ## Nasıl çalışır
 
 - Uç noktalar `<Issuer URL>/.well-known/openid-configuration` adresinden okunur ve bir saat önbellekte tutulur.
 - Kullanıcı bilgisi `userinfo` uç noktasından alınır: `sub`, `email`, `email_verified`, `given_name`, `family_name`, `picture`.
 - İlk girişte kullanıcı hesabı kendiliğinden oluşur. Yeni kayıtlar kapalıysa (`ENABLE_SIGNUP=0`) yalnızca davet edilmiş e-postalar girebilir.
-- "Sync" anahtarı açıksa ad ve profil resmi her girişte Zitadel'den güncellenir.
+- Ad ve profil resmi Zitadel'den yalnızca hesap ilk oluşturulurken alınır. Sonraki girişlerde kullanıcının kendi profil ayarlarına dokunulmaz.
 
 ## Sınırlar
 

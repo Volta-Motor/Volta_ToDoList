@@ -6,14 +6,14 @@
 
 // plane imports
 import { useTranslation } from "@plane/i18n";
-import type { TStateGroups } from "@plane/types";
 // local imports
 import { GROUP_COLORS } from "./palette";
+import type { TBoardColumn } from "./palette";
 
 type Props = {
-  groups: TStateGroups[];
+  groups: TBoardColumn[];
   /** Number of work items per column, after the board's filters. */
-  counts: Record<TStateGroups, number>;
+  counts: Record<TBoardColumn, number>;
   /** Total story points of the work items on the board. */
   points: number;
 };

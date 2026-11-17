@@ -5,6 +5,7 @@
  */
 
 import { observer } from "mobx-react";
+import { useParams } from "next/navigation";
 // plane imports
 import { Button } from "@makeplane/propel/components/button";
 import { BoardOutline } from "@makeplane/propel/icons";
@@ -16,12 +17,18 @@ import { EIssuesStoreType } from "@plane/types";
 import { BreadcrumbLink } from "@/components/common/breadcrumb-link";
 // hooks
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
+import { useProject } from "@/hooks/store/use-project";
 
 export const GeneralBoardHeader = observer(function GeneralBoardHeader() {
+  // router: the project's own board carries the project in the address
+  const { workspaceSlug, projectId } = useParams();
   // store hooks
   const { toggleCreateIssueModal } = useCommandPalette();
+  const { getProjectById } = useProject();
   // translation
   const { t } = useTranslation();
+  // derived values
+  const project = projectId ? getProjectById(projectId.toString()) : undefined;
 
   return (
     <Header>
@@ -31,10 +38,12 @@ export const GeneralBoardHeader = observer(function GeneralBoardHeader() {
             component={
               <BreadcrumbLink
                 label={t("general_board.title")}
+                href={project ? `/${workspaceSlug?.toString()}/board` : undefined}
                 icon={<BoardOutline className="size-4 text-tertiary" />}
               />
             }
           />
+          {project && <Breadcrumbs.Item component={<BreadcrumbLink label={project.name} />} />}
         </Breadcrumbs>
       </Header.LeftItem>
       <Header.RightItem>
@@ -43,7 +52,8 @@ export const GeneralBoardHeader = observer(function GeneralBoardHeader() {
           size="md"
           stretch="auto"
           label={t("issue.new")}
-          onClick={() => toggleCreateIssueModal(true, EIssuesStoreType.PROJECT)}
+          // on a project's board the new work item is opened for that project
+          onClick={() => toggleCreateIssueModal(true, EIssuesStoreType.PROJECT, project ? [project.id] : undefined)}
         />
       </Header.RightItem>
     </Header>

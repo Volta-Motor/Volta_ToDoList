@@ -25,7 +25,8 @@ type Props<T extends FieldValues> = {
   providerName: string;
   control: Control<T>;
   formFields: TControllerInputFormField<T>[];
-  switchField: TControllerSwitchFormField<T>;
+  /** The provider's "sync profile on every login" switch; left out for a provider without one. */
+  switchField?: TControllerSwitchFormField<T>;
   onSave: (e?: BaseSyntheticEvent) => Promise<void>;
   serviceDetails: TCopyField[];
   // providers with web-only callback URLs list them separately under a "Web" heading
@@ -70,7 +71,7 @@ export function OAuthProviderForm<T extends FieldValues>(props: Props<T>) {
                 required={field.required}
               />
             ))}
-            <ControllerSwitch control={control} field={switchField} />
+            {switchField && <ControllerSwitch control={control} field={switchField} />}
             <div className="flex flex-col gap-1 pt-4">
               <div className="flex flex-wrap items-center gap-2">
                 <Button

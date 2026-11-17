@@ -103,6 +103,8 @@ export const coreRoutes: RouteConfigEntry[] = [
         // General board: work items of every project on one board
         layout("./(all)/[workspaceSlug]/(projects)/board/layout.tsx", [
           route(":workspaceSlug/board", "./(all)/[workspaceSlug]/(projects)/board/page.tsx"),
+          // the same board for a single project
+          route(":workspaceSlug/board/:projectId", "./(all)/[workspaceSlug]/(projects)/board/[projectId]/page.tsx"),
         ]),
 
         // Activity reports: work completed per month, as input for the monthly report

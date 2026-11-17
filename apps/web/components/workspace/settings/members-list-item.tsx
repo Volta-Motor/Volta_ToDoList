@@ -14,6 +14,7 @@ import type { IWorkspaceMember } from "@plane/types";
 import { DataTable } from "@/components/common/data-table";
 import { MembersLayoutLoader } from "@/components/ui/loader/layouts/members-layout-loader";
 import { ConfirmWorkspaceMemberRemove } from "@/components/workspace/confirm-workspace-member-remove";
+import { ResetMemberPasswordDialog } from "@/components/workspace/settings/reset-member-password-dialog";
 import type { RowData } from "@/components/workspace/settings/member-columns";
 // hooks
 import { useMember } from "@/hooks/store/use-member";
@@ -29,7 +30,8 @@ type Props = {
 
 export const WorkspaceMembersListItem = observer(function WorkspaceMembersListItem(props: Props) {
   const { memberDetails } = props;
-  const { columns, workspaceSlug, removeMemberModal, setRemoveMemberModal } = useMemberColumns();
+  const { columns, workspaceSlug, removeMemberModal, setRemoveMemberModal, resetPasswordModal, setResetPasswordModal } =
+    useMemberColumns();
   // router
   const router = useAppRouter();
   // store hooks
@@ -103,6 +105,16 @@ export const WorkspaceMembersListItem = observer(function WorkspaceMembersListIt
             display_name: removeMemberModal.member.display_name || "",
           }}
           onSubmit={() => handleRemove(removeMemberModal.member.id)}
+        />
+      )}
+      {resetPasswordModal && (
+        <ResetMemberPasswordDialog
+          workspaceSlug={workspaceSlug.toString()}
+          member={{
+            id: resetPasswordModal.member.id,
+            display_name: resetPasswordModal.member.display_name || resetPasswordModal.member.email || "",
+          }}
+          onClose={() => setResetPasswordModal(null)}
         />
       )}
       <DataTable<RowData>

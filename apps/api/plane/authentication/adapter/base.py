@@ -126,7 +126,9 @@ class Adapter:
             "github": "ENABLE_GITHUB_SYNC",
             "gitlab": "ENABLE_GITLAB_SYNC",
             "gitea": "ENABLE_GITEA_SYNC",
-            "oidc": "ENABLE_OIDC_SYNC",
+            # "oidc" is left out on purpose: a profile is filled from the identity provider when
+            # the account is first created and is the user's own from then on. Syncing on every
+            # login replaced the name they had set and removed their picture.
         }
         config_key = provider_config_map.get(self.provider)
         if config_key:

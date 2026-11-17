@@ -17,6 +17,8 @@ export interface IState {
   sequence: number;
   workspace_id: string;
   order: number;
+  /** Marks a state the board treats specially, e.g. "consultant". */
+  external_id?: string | null;
 }
 
 export interface IStateLite {

@@ -177,11 +177,19 @@ class TestOIDCCallback:
         assert User.objects.filter(email="ada.lovelace@example.com").count() == 1
         assert client.session["_auth_user_id"] == str(existing.id)
 
-    def test_profile_sync_without_a_picture(self):
-        # Zitadel sends no `picture` for a user without one. With sync on this used to write NULL
-        # into the avatar column of an existing user and answer 500.
+    def test_login_leaves_an_existing_profile_alone(self):
+        # The profile is filled from the provider when the account is created and belongs to the
+        # user afterwards. A stored sync setting from an earlier version must not bring the
+        # overwrite back: it replaced the name the user had set and removed their picture.
         _configure(ENABLE_OIDC_SYNC="1")
-        existing = User.objects.create(email="ada.lovelace@example.com", username="ada", first_name="Old")
+        existing = User.objects.create(
+            email="ada.lovelace@example.com",
+            username="ada",
+            first_name="Augusta",
+            last_name="King",
+            display_name="Countess",
+            avatar="https://example.com/own-picture.png",
+        )
         Profile.objects.create(user=existing)
 
         client, response = _complete_login(USERINFO)
@@ -189,8 +197,9 @@ class TestOIDCCallback:
         assert response.status_code == 302
         assert _error_code(response) is None
         existing.refresh_from_db()
-        assert existing.first_name == "Ada"
-        assert existing.avatar == ""
+        assert (existing.first_name, existing.last_name) == ("Augusta", "King")
+        assert existing.display_name == "Countess"
+        assert existing.avatar == "https://example.com/own-picture.png"
         assert client.session["_auth_user_id"] == str(existing.id)
 
     def test_unverified_email_is_refused(self):

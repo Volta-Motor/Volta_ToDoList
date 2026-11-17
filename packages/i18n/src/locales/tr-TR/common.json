@@ -1,4 +1,16 @@
 {
+  "member_password_reset": {
+    "action": "Parolayı sıfırla",
+    "confirm_title": "{name} için parola sıfırlansın mı?",
+    "confirm_description": "Geçici bir parola oluşturulur. Mevcut parolası geçersiz olur ve açık oturumları kapanır.",
+    "resetting": "Sıfırlanıyor",
+    "done_title": "Geçici parola",
+    "done_description": "Bu parola yalnızca şimdi gösterilir. {name} ile güvenli bir yoldan paylaşın ve ilk girişte değiştirmesini isteyin.",
+    "copy": "Parolayı kopyala",
+    "copied": "Parola kopyalandı",
+    "close": "Kapat",
+    "failed": "Parola sıfırlanamadı"
+  },
   "test_criteria": {
     "title": "Test kriterleri",
     "progress": "{done}/{total} geçti",
@@ -52,6 +64,7 @@
     }
   },
   "general_board": {
+    "project_board": "Tahta",
     "title": "Board",
     "project": "Proje",
     "assignee": "Atanan",
@@ -71,6 +84,7 @@
       "backlog": "Bekleyen",
       "unstarted": "Yapılacak",
       "started": "Devam ediyor",
+      "consultant": "Danışmanda",
       "completed": "Tamamlandı",
       "cancelled": "İptal"
     },

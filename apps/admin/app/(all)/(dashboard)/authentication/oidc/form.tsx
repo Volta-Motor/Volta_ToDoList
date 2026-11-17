@@ -11,7 +11,6 @@ import type { IFormattedInstanceConfiguration, TInstanceOIDCAuthenticationConfig
 // components
 import { CodeBlock } from "@/components/common/code-block";
 import type { TControllerInputFormField } from "@/components/common/controller-input";
-import type { TControllerSwitchFormField } from "@/components/common/controller-switch";
 import type { TCopyField } from "@/components/common/copy-field";
 import { OAuthProviderForm } from "@/components/authentication/oauth-provider-form";
 // hooks
@@ -22,11 +21,6 @@ type Props = {
 };
 
 type OIDCConfigFormValues = Record<TInstanceOIDCAuthenticationConfigurationKeys, string>;
-
-const OIDC_FORM_SWITCH_FIELD: TControllerSwitchFormField<OIDCConfigFormValues> = {
-  name: "ENABLE_OIDC_SYNC",
-  label: "OpenID Connect",
-};
 
 export function InstanceOIDCConfigForm(props: Props) {
   const { config } = props;
@@ -40,7 +34,6 @@ export function InstanceOIDCConfigForm(props: Props) {
     OIDC_ISSUER_URL: config["OIDC_ISSUER_URL"] || "",
     OIDC_CLIENT_ID: config["OIDC_CLIENT_ID"] || "",
     OIDC_CLIENT_SECRET: config["OIDC_CLIENT_SECRET"] || "",
-    ENABLE_OIDC_SYNC: config["ENABLE_OIDC_SYNC"] || "0",
   });
 
   const originURL = !isEmpty(API_BASE_URL) ? API_BASE_URL : typeof window !== "undefined" ? window.location.origin : "";
@@ -113,7 +106,6 @@ export function InstanceOIDCConfigForm(props: Props) {
       providerName="OpenID Connect"
       control={control}
       formFields={OIDC_FORM_FIELDS}
-      switchField={OIDC_FORM_SWITCH_FIELD}
       onSave={onSave}
       serviceDetails={OIDC_SERVICE_FIELD}
     />
