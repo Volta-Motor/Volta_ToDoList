@@ -62,8 +62,7 @@ export type TInstanceOIDCAuthenticationConfigurationKeys =
   | "OIDC_PROVIDER_NAME"
   | "OIDC_ISSUER_URL"
   | "OIDC_CLIENT_ID"
-  | "OIDC_CLIENT_SECRET"
-  | "ENABLE_OIDC_SYNC";
+  | "OIDC_CLIENT_SECRET";
 
 export type TInstanceAuthenticationConfigurationKeys =
   | TInstanceGoogleAuthenticationConfigurationKeys
