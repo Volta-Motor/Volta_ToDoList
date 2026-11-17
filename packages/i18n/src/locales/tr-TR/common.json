@@ -64,6 +64,7 @@
     }
   },
   "general_board": {
+    "project_board": "Tahta",
     "title": "Board",
     "project": "Proje",
     "assignee": "Atanan",
@@ -83,6 +84,7 @@
       "backlog": "Bekleyen",
       "unstarted": "Yapılacak",
       "started": "Devam ediyor",
+      "consultant": "Danışmanda",
       "completed": "Tamamlandı",
       "cancelled": "İptal"
     },

@@ -10,7 +10,7 @@ import { observer } from "mobx-react";
 // plane imports
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
-import type { TIssue, TStateGroups } from "@plane/types";
+import type { TIssue } from "@plane/types";
 import { cn } from "@plane/utils";
 import { useStoryPoints } from "@/components/story-points/use-story-points";
 // hooks
@@ -23,6 +23,7 @@ import { GeneralBoardCard } from "./card";
 import { FilterChip } from "./filter-chip";
 import { FlowStrip } from "./flow-strip";
 import { GROUP_COLORS, tint } from "./palette";
+import type { TBoardColumn } from "./palette";
 import type { TProjectTag } from "./project-tag";
 import { getProjectTag, ProjectTag } from "./project-tag";
 import { CLOSED_ITEMS_LIMIT, GENERAL_BOARD_GROUPS, useGeneralBoard } from "./use-general-board";
@@ -32,10 +33,12 @@ const UNASSIGNED = "unassigned";
 
 type Props = {
   workspaceSlug: string;
+  /** When given, the board shows this project only (the project's own board). */
+  projectId?: string;
 };
 
 export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props) {
-  const { workspaceSlug } = props;
+  const { workspaceSlug, projectId } = props;
   // store hooks
   const { joinedProjectIds, getProjectById } = useProject();
   const { getUserDetails } = useMember();
@@ -53,14 +56,14 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
     getItemGroup,
     moveItem,
     setAssignees,
-  } = useGeneralBoard(workspaceSlug);
+  } = useGeneralBoard(workspaceSlug, projectId);
   const { isCreateIssueModalOpen } = useCommandPalette();
   const { getStoryPoints, sumStoryPoints } = useStoryPoints(workspaceSlug);
   // state
-  const [projectFilter, setProjectFilter] = useState<string>(ALL);
+  const [projectFilter, setProjectFilter] = useState<string>(projectId ?? ALL);
   const [assigneeFilter, setAssigneeFilter] = useState<string>(ALL);
   const [draggedItem, setDraggedItem] = useState<TIssue | undefined>(undefined);
-  const [dropTarget, setDropTarget] = useState<TStateGroups | undefined>(undefined);
+  const [dropTarget, setDropTarget] = useState<TBoardColumn | undefined>(undefined);
 
   // a work item created from the header button shows up once its modal closes
   const wasCreateModalOpen = useRef(false);
@@ -72,7 +75,9 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
   // every project keeps one tag color, assigned in identifier order
   const projectTags = useMemo(() => {
     const projects = sortBy(
-      joinedProjectIds.map((projectId) => getProjectById(projectId)).filter((project) => project !== undefined),
+      joinedProjectIds
+        .map((joinedProjectId) => getProjectById(joinedProjectId))
+        .filter((project) => project !== undefined),
       (project) => project.identifier
     );
     const tags: Record<string, TProjectTag> = {};
@@ -106,7 +111,7 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
 
   const itemsByGroup = useMemo(() => {
     const grouped = Object.fromEntries(GENERAL_BOARD_GROUPS.map((group) => [group, [] as TIssue[]])) as Record<
-      TStateGroups,
+      TBoardColumn,
       TIssue[]
     >;
     visibleItems.forEach((item) => {
@@ -119,22 +124,22 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
   const countsByGroup = useMemo(
     () =>
       Object.fromEntries(GENERAL_BOARD_GROUPS.map((group) => [group, itemsByGroup[group].length])) as Record<
-        TStateGroups,
+        TBoardColumn,
         number
       >,
     [itemsByGroup]
   );
 
-  const canEdit = (projectId: string | null | undefined) =>
-    Boolean(projectId) &&
+  const canEdit = (itemProjectId: string | null | undefined) =>
+    Boolean(itemProjectId) &&
     allowPermissions(
       [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
       EUserPermissionsLevel.PROJECT,
       workspaceSlug,
-      projectId ?? undefined
+      itemProjectId ?? undefined
     );
 
-  const handleDrop = (group: TStateGroups) => {
+  const handleDrop = (group: TBoardColumn) => {
     const item = draggedItem;
     setDraggedItem(undefined);
     setDropTarget(undefined);
@@ -152,22 +157,24 @@ export const GeneralBoardRoot = observer(function GeneralBoardRoot(props: Props)
     <div className="flex h-full w-full flex-col overflow-hidden bg-surface-1">
       <div className="flex flex-shrink-0 flex-col gap-2.5 border-b border-subtle px-5 py-3">
         <FlowStrip groups={GENERAL_BOARD_GROUPS} counts={countsByGroup} points={sumStoryPoints(visibleItems)} />
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("general_board.project")}>
-          <span className="w-14 text-caption-md-medium text-tertiary">{t("general_board.project")}</span>
-          <FilterChip isSelected={projectFilter === ALL} onClick={() => setProjectFilter(ALL)}>
-            {t("general_board.all")}
-          </FilterChip>
-          {projectTags.projects.map((project) => (
-            <FilterChip
-              key={project.id}
-              isSelected={projectFilter === project.id}
-              onClick={() => setProjectFilter(project.id)}
-            >
-              <ProjectTag tag={projectTags.tags[project.id]} />
-              {project.name}
+        {!projectId && (
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("general_board.project")}>
+            <span className="w-14 text-caption-md-medium text-tertiary">{t("general_board.project")}</span>
+            <FilterChip isSelected={projectFilter === ALL} onClick={() => setProjectFilter(ALL)}>
+              {t("general_board.all")}
             </FilterChip>
-          ))}
-        </div>
+            {projectTags.projects.map((project) => (
+              <FilterChip
+                key={project.id}
+                isSelected={projectFilter === project.id}
+                onClick={() => setProjectFilter(project.id)}
+              >
+                <ProjectTag tag={projectTags.tags[project.id]} />
+                {project.name}
+              </FilterChip>
+            ))}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("general_board.assignee")}>
           <span className="w-14 text-caption-md-medium text-tertiary">{t("general_board.assignee")}</span>
           <FilterChip isSelected={assigneeFilter === ALL} onClick={() => setAssigneeFilter(ALL)}>

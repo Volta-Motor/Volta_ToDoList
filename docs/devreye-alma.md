@@ -85,6 +85,7 @@ Adres değişince Zitadel'deki yönlendirme adresini de güncelleyin.
 - Bir kişinin işleri görebilmesi için **çalışma alanına davet edilmesi** yeterlidir (çalışma alanı adı → Ayarlar → Üyeler → Üye ekle). Yönetici ve Üye rolündekiler bütün projelere kendiliğinden eklenir; yeni açılan projeler de bir sonraki sayfa açılışında herkese görünür.
 - **Misafir** rolü kısıtlıdır: yalnızca elle eklendiği projeleri görür.
 - Bir projeden elle çıkarılan kişi o projeye yeniden eklenmez.
+- **Parolasını unutan üye:** yönetici, Üyeler sayfasında kişinin satırındaki menüden **Parolayı sıfırla** ile geçici parola üretir. Parola bir kez gösterilir; kişinin eski parolası ve açık oturumları geçersiz olur. Sunucudan komutla da yapılabilir: `docker compose exec api python manage.py reset_password kisi@sirket.com`.
 - Bu davranışı kapatmak için `.env` dosyasına `TODOLIST_AUTO_PROJECT_MEMBERSHIP=0` yazıp `docker compose up -d` çalıştırın; o zaman her projeye üyeler elle eklenir.
 
 ## Sunucudaki diğer uygulamalara etkisi

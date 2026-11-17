@@ -64,6 +64,7 @@
     }
   },
   "general_board": {
+    "project_board": "Board",
     "title": "Board",
     "project": "Project",
     "assignee": "Assignee",
@@ -83,6 +84,7 @@
       "backlog": "Backlog",
       "unstarted": "To do",
       "started": "In progress",
+      "consultant": "With consultant",
       "completed": "Done",
       "cancelled": "Cancelled"
     },

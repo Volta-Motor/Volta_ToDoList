@@ -21,6 +21,9 @@ Kod GNU AGPL-3.0 lisansı altındadır; bkz. `LICENSE.txt` ve `COPYRIGHT.txt`. P
 5. Story point: her projede Fibonacci (1, 2, 3, 5, 8, 13, 21) puan sistemi kendiliğinden tanımlı; kartta, sütun toplamında ve raporda görünür
 6. Faaliyet raporları ekranı: seçilen ayda tamamlanan ve devam eden işler, proje bazında
 7. Otomatik proje üyeliği: çalışma alanının yönetici ve üyeleri bütün projelerin üyesidir; kişiyi yalnızca çalışma alanına davet etmek yeterlidir
+8. "Danışmanda" sütunu: her projede Devam ediyor ile Tamamlandı arasında ayrı bir durum
+9. Proje tahtası: her projenin kendi tahtası (kenar çubuğunda proje altında "Tahta"); genel board hepsini birlikte gösterir
+10. Yöneticinin üyeye geçici parola ataması (Çalışma alanı ayarları → Üyeler)
 
 Plane'de bulunmayan arka uç eklemeleri `apps/api/plane/todolist` uygulamasında durur; kendi migration'ları vardır ve Plane'in migration zinciriyle çakışmaz.
 

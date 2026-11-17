@@ -14,12 +14,22 @@ import type { TIssue, TStateGroups } from "@plane/types";
 // hooks
 import { useMember } from "@/hooks/store/use-member";
 import { useProjectState } from "@/hooks/store/use-project-state";
+// local imports
+import { CONSULTANT_STATE_MARK } from "./palette";
+import type { TBoardColumn } from "./palette";
 // services
 import { IssueService } from "@/services/issue/issue.service";
 import { WorkspaceService } from "@/services/workspace.service";
 
-/** Columns of the general board, in display order. */
-export const GENERAL_BOARD_GROUPS: TStateGroups[] = ["backlog", "unstarted", "started", "completed", "cancelled"];
+/** Columns of the board, in display order. */
+export const GENERAL_BOARD_GROUPS: TBoardColumn[] = [
+  "backlog",
+  "unstarted",
+  "started",
+  "consultant",
+  "completed",
+  "cancelled",
+];
 
 const OPEN_GROUPS: TStateGroups[] = ["backlog", "unstarted", "started"];
 const CLOSED_GROUPS: TStateGroups[] = ["completed", "cancelled"];
@@ -38,7 +48,9 @@ type TBoardData = {
   hasMoreClosedWork: boolean;
 };
 
-const fetchBoardItems = async (workspaceSlug: string): Promise<TBoardData> => {
+const fetchBoardItems = async (workspaceSlug: string, projectId?: string): Promise<TBoardData> => {
+  // a project's own board asks only for that project, so its closed work is not crowded out
+  const projectFilter = projectId ? { project: projectId } : {};
   const items: TIssue[] = [];
   let isOpenWorkTruncated = true;
 
@@ -46,6 +58,7 @@ const fetchBoardItems = async (workspaceSlug: string): Promise<TBoardData> => {
     // Pages are read one after another on purpose: each response says whether another page exists.
     // oxlint-disable-next-line no-await-in-loop
     const response = await workspaceService.getViewIssues(workspaceSlug, {
+      ...projectFilter,
       state_group: OPEN_GROUPS.join(","),
       per_page: OPEN_PAGE_SIZE,
       cursor: `${OPEN_PAGE_SIZE}:${page}:0`,
@@ -58,6 +71,7 @@ const fetchBoardItems = async (workspaceSlug: string): Promise<TBoardData> => {
   }
 
   const closedResponse = await workspaceService.getViewIssues(workspaceSlug, {
+    ...projectFilter,
     state_group: CLOSED_GROUPS.join(","),
     order_by: "-updated_at",
     per_page: CLOSED_ITEMS_LIMIT,
@@ -69,10 +83,10 @@ const fetchBoardItems = async (workspaceSlug: string): Promise<TBoardData> => {
 };
 
 /**
- * Work items of every project the user can see, for the general board.
+ * Work items for the board: of every project the user can see, or of one project when given.
  * Moves and assignee changes are applied optimistically and rolled back if the request fails.
  */
-export const useGeneralBoard = (workspaceSlug: string | undefined) => {
+export const useGeneralBoard = (workspaceSlug: string | undefined, projectId?: string) => {
   // store hooks
   const { fetchWorkspaceStates, getStateById, getProjectStates } = useProjectState();
   const {
@@ -84,8 +98,8 @@ export const useGeneralBoard = (workspaceSlug: string | undefined) => {
   const [items, setItems] = useState<TIssue[]>([]);
 
   const { data, isLoading, error, mutate } = useSWR(
-    workspaceSlug ? `GENERAL_BOARD_ITEMS_${workspaceSlug}` : null,
-    workspaceSlug ? () => fetchBoardItems(workspaceSlug) : null,
+    workspaceSlug ? `GENERAL_BOARD_ITEMS_${workspaceSlug}_${projectId ?? "all"}` : null,
+    workspaceSlug ? () => fetchBoardItems(workspaceSlug, projectId) : null,
     { revalidateOnFocus: false }
   );
   useSWR(
@@ -103,8 +117,14 @@ export const useGeneralBoard = (workspaceSlug: string | undefined) => {
     if (data) setItems(data.items);
   }, [data]);
 
+  /** The column an item belongs to: its state group, or "consultant" when its state is the marked one. */
   const getItemGroup = useCallback(
-    (item: TIssue): TStateGroups | undefined => getStateById(item.state_id)?.group ?? item.state__group ?? undefined,
+    (item: TIssue): TBoardColumn | undefined => {
+      const state = getStateById(item.state_id);
+      if (state?.external_id === CONSULTANT_STATE_MARK) return "consultant";
+      const group = state?.group ?? item.state__group ?? undefined;
+      return group && (GENERAL_BOARD_GROUPS as string[]).includes(group) ? (group as TBoardColumn) : undefined;
+    },
     [getStateById]
   );
 
@@ -128,14 +148,20 @@ export const useGeneralBoard = (workspaceSlug: string | undefined) => {
     [t, workspaceSlug]
   );
 
-  /** Moves the item to the first state of the target group in the item's own project. */
+  /** Moves the item to the state of the target column in the item's own project. */
   const moveItem = useCallback(
-    async (item: TIssue, targetGroup: TStateGroups) => {
-      if (getItemGroup(item) === targetGroup) return;
-      const targetState = sortBy(
-        (getProjectStates(item.project_id) ?? []).filter((state) => state.group === targetGroup),
-        (state) => state.sequence
-      )[0];
+    async (item: TIssue, targetColumn: TBoardColumn) => {
+      if (getItemGroup(item) === targetColumn) return;
+      const projectStates = getProjectStates(item.project_id) ?? [];
+      // "consultant" is one marked state; every other column takes the first state of its group,
+      // leaving the marked one out of "started".
+      const candidates =
+        targetColumn === "consultant"
+          ? projectStates.filter((state) => state.external_id === CONSULTANT_STATE_MARK)
+          : projectStates.filter(
+              (state) => state.group === targetColumn && state.external_id !== CONSULTANT_STATE_MARK
+            );
+      const targetState = sortBy(candidates, (state) => state.sequence)[0];
       if (!targetState) {
         setToast({
           type: "error",
@@ -144,7 +170,7 @@ export const useGeneralBoard = (workspaceSlug: string | undefined) => {
         });
         return;
       }
-      await patchItem(item, { state_id: targetState.id }, { state__group: targetGroup });
+      await patchItem(item, { state_id: targetState.id }, { state__group: targetState.group });
     },
     [getItemGroup, getProjectStates, patchItem, t]
   );
